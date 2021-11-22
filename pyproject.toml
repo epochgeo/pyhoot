@@ -1,0 +1,13 @@
+[tool.poetry]
+name = "hoot"
+version = "0.1.0"
+description = "Unofficial python bindings for Hootenanny"
+authors = ["Jason R. Surratt <jason@epochgeo.com>"]
+license = "MIT"
+build = "build.sh"
+
+[build-system]
+requires = [
+    "conan>=1.42"
+]
+build-backend = "setuptools.build_meta"
