@@ -13,7 +13,7 @@ conan_basic_setup()
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
-find_package(Python3 3.8 EXACT COMPONENTS Development)
+find_package(Python3 3.6 EXACT COMPONENTS Development)
 
 set(PYHOOT_HOME ${CMAKE_CURRENT_LIST_DIR})
 
@@ -33,6 +33,6 @@ message(${CONAN_LIBS})
 target_link_libraries(
     pyhoot
         ${Python3_LIBRARIES}
-        ${CONAN_LIBS}
+	HootCore
 )
 

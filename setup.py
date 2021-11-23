@@ -82,8 +82,8 @@ class CMakeBuild(build_ext):
         #self.copy_test_file(self.build_temp, "src/hoot")
         os.system(f"find {ext.sourcedir}")
         lib_dir = self.build_temp.replace("temp", "lib")
-        print([f"{self.build_temp}/lib/libpyhoot.so", f"{lib_dir}/pyhoot/libpyhoot.so"])
-        copyfile(f"{self.build_temp}/lib/libpyhoot.so", f"{lib_dir}/pyhoot/libpyhoot.so")
+        print([f"{self.build_temp}/lib/libpyhoot.so", f"{lib_dir}/hoot/libpyhoot.so"])
+        copyfile(f"{self.build_temp}/lib/libpyhoot.so", f"{lib_dir}/hoot/libpyhoot.so")
         os.system(f"find {ext.sourcedir}")
         print()  # Add an empty line for cleaner output
 
@@ -111,7 +111,7 @@ class CMakeBuild(build_ext):
         copymode(src_file, dest_file)
 
 setup(name = 'hoot',
-        version = '0.0.1',
+        version = '0.0.4',
         description = 'This is an unofficial wrapper of Hootenanny',
         ext_modules = [CMakeExtension("hoot/hoot")],
         packages = find_packages("src"),
@@ -120,6 +120,7 @@ setup(name = 'hoot',
             "info/*.cpp",
             "*.so",
         ]},
+	platforms = "manylinux2014",
         package_dir = {"": "src"},
         cmdclass=dict(build_ext=CMakeBuild),
         # don't try to run this from a zip file

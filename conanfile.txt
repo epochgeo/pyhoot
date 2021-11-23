@@ -1,3 +1,6 @@
+[options]
+hootenanny:shared=False
+
 [requires]
 pybind11/2.7.1
 hootenanny/0.2.64b@test/debug
