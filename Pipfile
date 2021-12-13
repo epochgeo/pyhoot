@@ -1,6 +1,9 @@
 [packages]
+auditwheel = "*"
 
 [dev-packages]
+# For "repairing" manylinux wheels
+auditwheel = "*"
 conan = "*"
 build = "*"
 twine = "*"

@@ -118,6 +118,7 @@ setup(name = 'hoot',
         package_data = {"": [
             "*.cpp",
             "info/*.cpp",
+            "util/*.cpp",
             "*.so",
         ]},
 	platforms = "manylinux2014",
