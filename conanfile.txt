@@ -1,7 +1,6 @@
 
 [requires]
 pybind11/2.7.1
-boost/1.71.0
 hootenanny/0.2.64b@test/debug
 
 [generators]

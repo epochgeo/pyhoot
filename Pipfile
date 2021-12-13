@@ -1,5 +1,6 @@
 [packages]
 auditwheel = "*"
+setuptools = "*"
 
 [dev-packages]
 # For "repairing" manylinux wheels
