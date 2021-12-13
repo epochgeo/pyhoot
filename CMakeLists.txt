@@ -1,13 +1,11 @@
 cmake_minimum_required(VERSION 3.12)
 project(hoot)
 
-message(${CMAKE_CURRENT_LIST_DIR})
-message(${CMAKE_CURRENT_SOURCE_DIR})
-
 add_definitions("-std=c++11")
 
-#include(conanbuildinfo.cmake)
-#include(${CMAKE_CURRENT_LIST_DIR}/conanbuildinfo.cmake)
+message(${CMAKE_CURRENT_BINARY_DIR})
+message(${CMAKE_CURRENT_LIST_DIR})
+
 if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/conanbuildinfo.cmake)
     include(${CMAKE_CURRENT_LIST_DIR}/conanbuildinfo.cmake)
 else()
@@ -16,10 +14,21 @@ endif()
 
 conan_basic_setup()
 
+# Only export the PyInit_* method
+# Taken from https://anadoxin.org/blog/control-over-symbol-exports-in-gcc.html/
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/libcode.version")
+
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
-message(${CONAN_INCLUDE_DIRS})
 find_package(Python3 3.6 EXACT COMPONENTS Development)
+
+list(REMOVE_ITEM CONAN_LIBS
+    wayland-server wayland-cursor wayland-egl wayland-client 
+    Qt5Gui
+    X11 X11-xcb xcb fontenc ICE SM Xau Xaw7 Xt Xcomposite Xcursor Xdamage Xfixes Xdmcp Xext Xft Xi Xinerama xkbfile Xmu Xmuu Xpm Xrandr Xrender XRes Xss Xtst Xv XvMC Xxf86vm xcb-xkb xcb-icccm xcb-image xcb-shm xcb-keysyms xcb-randr xcb-render xcb-render-util xcb-shape xcb-sync xcb-xfixes xcb-xinerama xcb-util xcb-dri3
+)
+
+set(CONAN_LIBS HootCore)
 
 set(PYHOOT_HOME ${CMAKE_CURRENT_LIST_DIR})
 

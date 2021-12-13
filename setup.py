@@ -1,6 +1,7 @@
 import os
 import re
 from shutil import copyfile
+import multiprocessing
 import sys
 import sysconfig
 import platform
@@ -16,7 +17,7 @@ from shutil import copyfile, copymode
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
-        Extension.__init__(self, name, sources=[])
+        Extension.__init__(self, name, sources=["libcode.version"])
         self.sourcedir = os.path.abspath(sourcedir)
 
 
@@ -45,7 +46,6 @@ class CMakeBuild(build_ext):
         pprint(self.build_temp)
         os.system(f"conan install {ext.sourcedir}")
         os.system(f"find {ext.sourcedir}")
-        #self.copy_file("src/hoot/info/Version.cpp", ext.sourcedir)
         extdir = os.path.abspath(
             os.path.dirname(self.get_ext_fullpath(ext.name)))
         #extdir = os.path.abspath(ext.sourcedir)
@@ -65,7 +65,7 @@ class CMakeBuild(build_ext):
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            build_args += ['--', f'-j{multiprocessing.cpu_count()}']
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(
@@ -116,6 +116,7 @@ setup(name = 'hoot',
         ext_modules = [CMakeExtension("hoot/hoot")],
         packages = find_packages("src"),
         package_data = {"": [
+            "libcode.version",
             "*.cpp",
             "info/*.cpp",
             "util/*.cpp",
