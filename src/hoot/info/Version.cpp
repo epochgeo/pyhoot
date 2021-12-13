@@ -26,3 +26,4 @@ PYBIND11_MODULE(libpyhoot, m) {
     py::class_<hoot::Version>(m, "Version")
         .def_static("getFullVersion", &hoot::Version::getFullVersion);
 }
+

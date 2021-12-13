@@ -7,6 +7,11 @@ conanbuildinfo.cmake
 conanbuildinfo.txt
 graph_info.json
 
+conan.lock
+conanfile.txt
+conaninfo.txt
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

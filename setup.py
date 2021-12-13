@@ -111,7 +111,7 @@ class CMakeBuild(build_ext):
         copymode(src_file, dest_file)
 
 setup(name = 'hoot',
-        version = '0.0.4',
+        version = '0.0.5',
         description = 'This is an unofficial wrapper of Hootenanny',
         ext_modules = [CMakeExtension("hoot/hoot")],
         packages = find_packages("src"),
