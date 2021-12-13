@@ -46,7 +46,6 @@ namespace pybind11 {
     }
 }
 
-
 void init_Factory(py::module_& m)
 {
     py::class_<hoot::Factory, std::unique_ptr<Factory, py::nodelete> >(m, "Factory")
@@ -64,3 +63,4 @@ void init_Factory(py::module_& m)
             "returns all registered classes that implement the given base class"
         );
 }
+
