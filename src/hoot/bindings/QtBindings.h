@@ -1,3 +1,9 @@
+/**
+ * MIT License
+ * https://opensource.org/licenses/MIT
+ * 
+ * @copyright Copyright (C) 2021 EpochGeo LLC (http://www.epochgeo.com/)
+ */
 
 #ifndef __QT_BINDINGS_H__
 #define __QT_BINDINGS_H__

@@ -1,20 +1,34 @@
+/**
+ * MIT License
+ * https://opensource.org/licenses/MIT
+ * 
+ * @copyright Copyright (C) 2021 EpochGeo LLC (http://www.epochgeo.com/)
+ */
 
 #include <boost/noncopyable.hpp>
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+// hoot includes
 #include <hoot/core/util/Factory.h>
+
+// pyhoot includes
+#include <hoot/bindings/PyBindModule.h>
+#include <hoot/bindings/QtBindings.h>
 
 namespace py = pybind11;
 
 using namespace hoot;
 
+namespace pyhoot
+{
+
 void init_Factory(py::module_& m)
 {
-    py::class_<hoot::Factory, std::unique_ptr<Factory, py::nodelete> >(m, "Factory")
+    auto factory = py::class_<hoot::Factory, std::unique_ptr<Factory, py::nodelete> >(m, "Factory")
         .def(py::init([]() { return &Factory::getInstance(); }))
-        .def("getObjectNamesByBase",
+        .def_static("getObjectNamesByBase",
             [](const QString& base) {
                 std::vector<std::string> result;
                 std::vector<QString> convertMe = Factory::getInstance().getObjectNamesByBase(base);
@@ -26,5 +40,10 @@ void init_Factory(py::module_& m)
             },
             "returns all registered classes that implement the given base class"
         );
+
+    PyBindModule::remapNames(factory);
 }
 
+REGISTER_PYHOOT_SUBMODULE(init_Factory)
+
+}

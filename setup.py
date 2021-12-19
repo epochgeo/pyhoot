@@ -1,7 +1,9 @@
+import glob
 import os
 import re
-from shutil import copyfile
+from shutil import copyfile, copymode, copytree, copy
 import multiprocessing
+from pathlib import Path
 import sys
 import sysconfig
 import platform
@@ -13,7 +15,8 @@ from distutils.version import LooseVersion
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 from setuptools.command.test import test as TestCommand
-from shutil import copyfile, copymode
+
+PYHOOT_VERSION = open(os.path.join(Path(__file__).parent.resolve(), "VERSION")).read()
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -82,10 +85,37 @@ class CMakeBuild(build_ext):
         #self.copy_test_file(self.build_temp, "src/hoot")
         os.system(f"find {ext.sourcedir}")
         lib_dir = self.build_temp.replace("temp", "lib")
+        out_dir = self.build_temp.replace("temp", "")
         print([f"{self.build_temp}/lib/libpyhoot.so", f"{lib_dir}/hoot/libpyhoot.so"])
         copyfile(f"{self.build_temp}/lib/libpyhoot.so", f"{lib_dir}/hoot/libpyhoot.so")
         os.system(f"find {ext.sourcedir}")
+        self.copy_dir(f"{self.build_temp}/conf", f"{lib_dir}/hoot/conf")
+        os.system(f"gunzip {lib_dir}/hoot/conf/dictionary/WordsAbridged.sqlite.gz")
+
+        self.copy_dir(f"{self.build_temp}/docs", f"{lib_dir}/hoot/docs", extension="*.asciidoc")
+        self.copy_dir(f"{self.build_temp}/rules", f"{lib_dir}/hoot/rules")
+        self.copy_dir(f"{self.build_temp}/bin", f"{lib_dir}/hoot/bin")
+        self.copy_dir(f"{self.build_temp}/gdal", f"{lib_dir}/hoot/gdal")
+        copyfile(f"{self.build_temp}/bin/RunHoot.sh", f"{lib_dir}/hoot/bin/hoot")
+        copyfile(f"{self.build_temp}/proj.db", f"{lib_dir}/hoot/proj.db")
+        copyfile(f"{self.build_temp}/res/test-files/ToyTestA.osm", f"{lib_dir}/hoot/ToyTestA.osm")
+        copyfile(f"{self.build_temp}/res/test-files/ToyTestB.osm", f"{lib_dir}/hoot/ToyTestB.osm")
+        # This needs to be executable.
+        os.system(f"chmod +x {lib_dir}/hoot/bin/hoot")
         print()  # Add an empty line for cleaner output
+
+    def copy_dir(self, src, dest, extension=None):
+        if extension is not None:
+            print(f"copying directory from {src} to {dest} with extension {extension}")
+            for file_path in glob.glob(os.path.join(src, '**', extension), recursive=True):
+                rel_path = str(Path(file_path).relative_to(src))
+                new_path = os.path.join(dest, rel_path)
+                print(f"copying {file_path} to {new_path}")
+                os.makedirs(os.path.dirname(new_path), exist_ok=True)
+                copy(file_path, new_path)
+        else:
+            print(f"copying directory from {src} to {dest}")
+            copytree(src, dest)
 
     def copy_file(self, src_file, dest_dir):
         '''
@@ -111,15 +141,22 @@ class CMakeBuild(build_ext):
         copymode(src_file, dest_file)
 
 setup(name = 'hoot',
-        version = '0.0.5',
+        version = PYHOOT_VERSION,
         description = 'This is an unofficial wrapper of Hootenanny',
+        long_description = open("README.md").read(),
+        long_description_content_type = "text/markdown",
         ext_modules = [CMakeExtension("hoot/hoot")],
         packages = find_packages("src"),
         package_data = {"": [
+            "VERSION",
             "libcode.version",
+            "*.h",
             "*.cpp",
-            "info/*.cpp",
-            "util/*.cpp",
+            "bindings/*",
+            "conflate/*",
+            "elements/*",
+            "info/*",
+            "util/*",
             "*.so",
         ]},
 	platforms = "manylinux2014",

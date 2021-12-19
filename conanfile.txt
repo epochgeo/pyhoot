@@ -2,6 +2,8 @@
 [requires]
 pybind11/2.7.1
 hootenanny/0.2.64b@test/debug
+# For some reason this isn't getting populated be dependent packages
+icu/69.1
 
 [generators]
 cmake

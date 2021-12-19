@@ -16,7 +16,13 @@ conan_basic_setup()
 
 # Only export the PyInit_* method
 # Taken from https://anadoxin.org/blog/control-over-symbol-exports-in-gcc.html/
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/libcode.version")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/libcode.version")
+add_compile_definitions(HOOT_HAVE_NODE_NODE_H)
+
+# This library isn't used directly
+list(FILTER CONAN_LIBS EXCLUDE REGEX "^icu.*")
+
+list(APPEND CONAN_LIBS libicui18n.a libicuuc.a)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
@@ -27,10 +33,14 @@ list(REMOVE_ITEM CONAN_LIBS
     Qt5Gui
     X11 X11-xcb xcb fontenc ICE SM Xau Xaw7 Xt Xcomposite Xcursor Xdamage Xfixes Xdmcp Xext Xft Xi Xinerama xkbfile Xmu Xmuu Xpm Xrandr Xrender XRes Xss Xtst Xv XvMC Xxf86vm xcb-xkb xcb-icccm xcb-image xcb-shm xcb-keysyms xcb-randr xcb-render xcb-render-util xcb-shape xcb-sync xcb-xfixes xcb-xinerama xcb-util xcb-dri3
 )
+list(APPEND CONAN_LIBS libqsqlite.a)
+link_directories({$CONAN_QT_ROOT}/bin/archdatadir/plugins/sqldrivers/)
 
-set(CONAN_LIBS HootCore)
+#set(CONAN_LIBS HootCore)
 
 set(PYHOOT_HOME ${CMAKE_CURRENT_LIST_DIR})
+
+include_directories(BEFORE ${PYHOOT_HOME}/src/)
 
 file(GLOB_RECURSE PYHOOT_FILES CONFIGURE_DEPENDS 
     ${PYHOOT_HOME}/src/*.h
@@ -48,8 +58,22 @@ target_include_directories(
 
 target_link_libraries(
     pyhoot
+    HootJs
     ${Python3_LIBRARIES}
     ${CONAN_LIBS}
     ${CONAN_LIBS_HOOTENANNY}
 )
+target_precompile_headers(
+    pyhoot
+    PUBLIC ${PYHOOT_HOME}/src/hoot/PyHootStable.h
+)
+
+file(COPY ${CONAN_HOOTENANNY_ROOT}/conf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CONAN_HOOTENANNY_ROOT}/rules DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CONAN_HOOTENANNY_ROOT}/bin DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CONAN_HOOTENANNY_ROOT}/docs DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CONAN_HOOTENANNY_ROOT}/gdal DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CONAN_HOOTENANNY_ROOT}/proj.db DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CONAN_HOOTENANNY_ROOT}/res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CONAN_QT_ROOT}/bin/archdatadir/plugins/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/)
 
