@@ -18,13 +18,6 @@
 #include <hoot/core/util/Factory.h>
 #include <hoot/core/util/Log.h>
 
-// // pybind11
-// #include <pybind11/functional.h>
-
-// pyhoot
-// #include <hoot/bindings/PyBindModule.h>
-// #include <hoot/bindings/QtBindings.h>
-
 // Qt
 #include <qnumeric.h>
 #include <QElapsedTimer>

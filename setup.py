@@ -48,7 +48,7 @@ class CMakeBuild(build_ext):
         pprint(ext.__dict__)
         pprint(self.build_temp)
         os.system(f"conan install {ext.sourcedir}")
-        os.system(f"find {ext.sourcedir}")
+        #os.system(f"find {ext.sourcedir}")
         extdir = os.path.abspath(
             os.path.dirname(self.get_ext_fullpath(ext.name)))
         #extdir = os.path.abspath(ext.sourcedir)
@@ -83,11 +83,13 @@ class CMakeBuild(build_ext):
         # Copy *_test file to tests directory
         #test_bin = os.path.join(self.build_temp, 'tests')
         #self.copy_test_file(self.build_temp, "src/hoot")
-        os.system(f"find {ext.sourcedir}")
+        #os.system(f"find {ext.sourcedir}")
         lib_dir = self.build_temp.replace("temp", "lib")
         out_dir = self.build_temp.replace("temp", "")
         print([f"{self.build_temp}/lib/libpyhoot.so", f"{lib_dir}/hoot/libpyhoot.so"])
-        copyfile(f"{self.build_temp}/lib/libpyhoot.so", f"{lib_dir}/hoot/libpyhoot.so")
+        # When creating a local development pip install, this won't exist
+        if os.path.exists(f"{self.build_temp}/lib/libpyhoot.so"):
+            copyfile(f"{self.build_temp}/lib/libpyhoot.so", f"{lib_dir}/hoot/libpyhoot.so")
         os.system(f"find {ext.sourcedir}")
         self.copy_dir(f"{self.build_temp}/conf", f"{lib_dir}/hoot/conf")
         os.system(f"gunzip {lib_dir}/hoot/conf/dictionary/WordsAbridged.sqlite.gz")
@@ -146,21 +148,28 @@ setup(name = 'hoot',
         long_description = open("README.md").read(),
         long_description_content_type = "text/markdown",
         ext_modules = [CMakeExtension("hoot/hoot")],
+        extras_require = {
+            "dev": [
+                "unittest",
+                "setuptools",
+            ]
+        },
         packages = find_packages("src"),
+        package_dir = {"": "src"},
         package_data = {"": [
             "VERSION",
             "libcode.version",
             "*.h",
             "*.cpp",
             "bindings/*",
+            "matching/*",
             "conflate/*",
             "elements/*",
             "info/*",
             "util/*",
             "*.so",
         ]},
-	platforms = "manylinux2014",
-        package_dir = {"": "src"},
+        platforms = "manylinux2014",
         cmdclass=dict(build_ext=CMakeBuild),
         # don't try to run this from a zip file
         zip_safe=False,

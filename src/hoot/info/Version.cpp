@@ -5,29 +5,31 @@
  * @copyright Copyright (C) 2021 EpochGeo LLC (http://www.epochgeo.com/)
  */
 
+// hoot
+#include <hoot/core/info/Version.h>
+
+// pybind11
 #include <pybind11/pybind11.h>
 
-#include <hoot/core/info/Version.h>
+// pyhoot
+#include <hoot/bindings/PyBindModule.h>
 
 namespace py = pybind11;
 
-int add(int i, int j) {
-    return i + j;
+namespace pyhoot
+{
+
+void init_Version(py::module_& m)
+{
+    auto wrapme = py::class_<hoot::Version>(m, "Version")
+        .def_static("getBuiltBy", &hoot::Version::getBuiltBy)
+        .def_static("getFullVersion", &hoot::Version::getFullVersion)
+        .def_static("getRevision", &hoot::Version::getRevision)
+        .def_static("getVersion", &hoot::Version::getVersion)
+    ;
+    PyBindModule::remapNames(wrapme);
 }
 
-const char* version() {
-    return hoot::Version::getFullVersion();
+REGISTER_PYHOOT_SUBMODULE(init_Version)
+
 }
-
-// PYBIND11_MODULE(libpyhoot, m) {
-//     m.doc() = "pybind11 example plugin"; // optional module docstring
-
-//     m.def("add", &add, "A function which adds two numbers");
-//     m.def("version", &hoot::Version::getFullVersion, "get hoot version");
-
-//     init_Factory(m);
-    
-//     py::class_<hoot::Version>(m, "Version")
-//         .def_static("getFullVersion", &hoot::Version::getFullVersion);
-// }
-

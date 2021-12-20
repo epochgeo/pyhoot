@@ -9,7 +9,6 @@
 
 // hoot
 #include <hoot/core/Hoot.h>
-#include <hoot/core/info/Version.h>
 #include <hoot/core/util/Log.h>
 #include <hoot/js/HootJsStable.h>
 #include <hoot/js/JsRegistrar.h>
@@ -39,8 +38,6 @@ PYBIND11_MODULE(libpyhoot, m) {
 
   PyBindModule::getInstance().initialize(m);
   
-  py::class_<hoot::Version>(m, "Version")
-      .def_static("getFullVersion", &hoot::Version::getFullVersion);
 }
 
 PyBindModule& PyBindModule::getInstance()

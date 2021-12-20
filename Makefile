@@ -4,6 +4,8 @@ FINAL_WHEEL = wheelhouse/hoot-$(VERSION)-cp36-cp36m-manylinux_2_17_x86_64.manyli
 
 all: build_wheel
 
+.force:
+
 clean:
 	rm -rf dist
 	rm -rf $(FINAL_WHEEL)
@@ -12,24 +14,29 @@ clean:
 
 build_wheel: $(FINAL_WHEEL)
 
+test: local
+	HOOT_HOME=`pwd`/build PYTHONPATH=`pwd`/build/lib/:`pwd`/src/ \
+        python -m unittest discover -s tests.hoot
+
 # do a quick install that won't test the final version
-quick: .quick
-.quick: dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
+quick: ._quick
+._quick: dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
 	python -m pip install --force dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
 	touch .quick
 
-installquick: .installquick
-.installquick: .quick
+installquick: ._installquick
+._installquick: ._quick
 	python -m pip install --force dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
 	touch .installquick
 
-install: .install
-.install: $(FINAL_WHEEL)
+install: ._install
+._install: $(FINAL_WHEEL)
 	python -m pip install --force $(FINAL_WHEEL)
 	touch .install
 
-test: .install
+testfinal: ._install
 	python -m hoot conflate tmp/ToyTestA.osm tmp/ToyTestA.osm tmp/ToyTestOut.osm
+	python -m unittest discover -s tests.hoot
 
 $(FINAL_WHEEL): dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
 	auditwheel repair --plat manylinux_2_17_x86_64 dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
@@ -59,7 +66,14 @@ unzipquick: .quick
 	rm -rf tmp/unzip
 	unzip dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl -d tmp/unzip
 
-local:
-	rm -rf build
-	mkdir build
-	cd build && conan install .. && cmake .. && make
+local: src/hoot/libpyhoot.so
+
+src/hoot/libpyhoot.so: build/lib/libpyhoot.so
+	cp build/lib/libpyhoot.so src/hoot/
+
+build/lib/libpyhoot.so: .force
+	cd build && $(MAKE)
+
+build/Makefile: conanfile.txt CMakeLists.txt
+	cd build && conan install .. && cmake ..
+

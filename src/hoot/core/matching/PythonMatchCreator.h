@@ -21,6 +21,8 @@
 namespace hoot
 {
 
+class PythonMatchVisitor;
+
 /**
  * Match creator for all generic conflation scripts
  *
@@ -32,10 +34,8 @@ public:
 
   static QString className() { return "PythonMatchCreator"; }
 
-  static const QString POINT_POLYGON_SCRIPT_NAME;
-
   PythonMatchCreator();
-  ~PythonMatchCreator() override = default;kkkkkkkkj
+  ~PythonMatchCreator() override = default;
 
   /**
    * @see SearchRadiusProvider
@@ -120,6 +120,8 @@ private:
 
   ElementCriterionPtr _pointPolyPolyCrit;
   ElementCriterionPtr _pointPolyPointCrit;
+
+  std::shared_ptr<PythonMatchVisitor> _getCachedVisitor(const ConstOsmMapPtr& map);
 
   hoot::CreatorDescription _getScriptDescription(QString path) const;
   /**
