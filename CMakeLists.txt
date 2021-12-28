@@ -17,6 +17,9 @@ conan_basic_setup()
 # Only export the PyInit_* method
 # Taken from https://anadoxin.org/blog/control-over-symbol-exports-in-gcc.html/
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/libcode.version")
+
+# Only show the first 5 errors.
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmax-errors=5")
 add_compile_definitions(HOOT_HAVE_NODE_NODE_H)
 
 # This library isn't used directly
@@ -59,13 +62,14 @@ target_include_directories(
 target_link_libraries(
     pyhoot
     HootJs
+    HootTest
     ${Python3_LIBRARIES}
     ${CONAN_LIBS}
     ${CONAN_LIBS_HOOTENANNY}
 )
 target_precompile_headers(
     pyhoot
-    PUBLIC ${PYHOOT_HOME}/src/hoot/PyHootStable.h
+    PUBLIC ${PYHOOT_HOME}/src/hoot/py/PyHootStable.h
 )
 
 file(COPY ${CONAN_HOOTENANNY_ROOT}/conf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
