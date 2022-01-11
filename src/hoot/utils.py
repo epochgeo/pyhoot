@@ -1,6 +1,8 @@
-"""utils contains a number of useful utility functions that are not part of c++ hootenanny"""
-
-from .libpyhoot import OsmMap, OsmJsonReader, OsmJsonWriter, Status
+"""
+utils contains a number of useful utility functions that are not part of
+c++ hootenanny
+"""
+from .libpyhoot import OsmMap, OsmJsonReader, Status
 
 
 def load_json(json: str, default_status=Status.INVALID):
@@ -13,6 +15,3 @@ def load_json(json: str, default_status=Status.INVALID):
     reader.load_from_string(json, result)
 
     return result
-
-def to_json(osm_map: OsmMap):
-    return OsmJsonWriter().to_string(osm_map)

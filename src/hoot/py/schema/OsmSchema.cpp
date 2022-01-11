@@ -30,7 +30,10 @@ void init_OsmSchema(py::module_& m)
     auto osmSchema = py::class_<hoot::OsmSchema, std::unique_ptr<OsmSchema, py::nodelete> >
         (m, "OsmSchema")
         .def(py::init([]() { return OsmSchema::getInstance(); }))
-        .def_static("getInstance", &OsmSchema::getInstance)
+        .def_static("getInstance", &OsmSchema::getInstance, R"TOK(
+get_instance() is provided for consistency w/ hoot but just calling OsmSchema() gives the same
+result and is more concise.
+)TOK")
 
   //static OsmSchema& getInstance()
 
@@ -134,6 +137,12 @@ minimumScore must be > 0.
   // std::vector<SchemaVertex> getChildTagsAsVertices(const QString& name) const;
   // std::vector<SchemaVertex> getAssociatedTagsAsVertices(const QString& name) const;
 
+        .def("getTagVertex", &OsmSchema::getTagVertex,
+R"TOK(
+Returns the tag vertex for a given kvp. If the vertex is compound then an empty vertex will
+be returned.
+)TOK")
+
 
         .def("getSchemaVertices", &OsmSchema::getSchemaVertices,
 R"TOK(
@@ -206,16 +215,20 @@ Return true if this tag can contain numeric text."
 )TOK")
         .def("getIsACost", &OsmSchema::getIsACost)
 //         .def("score", &OsmSchema::score)
-//         .def("score", &OsmSchema::score)
+        .def("score", [](const OsmSchema& self, const SchemaVertex& v1, const SchemaVertex& v2) {
+           return self.score(v1, v2);
+        })
 
-//         .def("score", &OsmSchema::score,
-// R"TOK(
-// Scores a particular kvp against an element's tags
+        .def("score", [](const OsmSchema& self, const QString& kvp, const Tags& tags) {
+           return self.score(kvp, tags);
+        },
+R"TOK(
+Scores a particular kvp against an element's tags
 
-// :param kvp: the key/value pair to compare against
-// :param tags: the tags to compare against
-// :returns: the highest similarity score found in tags when compared to kvp"
-// )TOK")
+:param kvp: the key/value pair to compare against
+:param tags: the tags to compare against
+:returns: the highest similarity score found in tags when compared to kvp"
+)TOK")
 
         .def("scoreTypes", &OsmSchema::scoreTypes,
 R"TOK(

@@ -13,6 +13,7 @@
 #define __PYTHON_CREATOR_DESCRIPTION_H__
 
 // hoot
+#include <hoot/core/elements/ElementId.h>
 #include <hoot/core/util/Units.h>
 
 namespace hoot
@@ -39,7 +40,9 @@ using InitFunction = std::function<void(const ConstOsmMapPtr& map)>;
 using IsMatchCandidateFunction = std::function<bool(
   const ConstOsmMapPtr& map,
   const ConstElementPtr& element)>;
-using MatchScoreFunction = std::function<MatchClassificationPtr(
+using IsWholeGroupFunction = std::function<bool()>;
+using MatchScoreFunction = std::function<
+std::tuple<MatchClassificationPtr, QString>(
   const ConstOsmMapPtr& map,
   const ConstElementPtr& element1,
   const ConstElementPtr& element2)>;
@@ -47,6 +50,10 @@ using MergePairFunction = std::function<ConstElementPtr(
   const ConstOsmMapPtr& map,
   const ConstElementPtr& element1,
   const ConstElementPtr& element2)>;
+using MergeSetFunction = std::function<
+  std::vector<std::pair<ElementId, ElementId>>(
+    const ConstOsmMapPtr& map,
+    const std::set<std::pair<ElementId, ElementId>>& pairs)>;
 using SearchRadiusFunction = std::function<Meters(const ConstElementPtr& e)>;
 
 /**
@@ -66,20 +73,22 @@ public:
 
   QStringList getCriteria() const { return _criteria; }
   CreatorDescriptionPtr getDescription();
-  InitFunction getInitFunction() const { return _initFunc; }
-  IsMatchCandidateFunction getIsMatchCandidateFunction() const { return _isMatchCandidateFunc; }
-  MatchScoreFunction getMatchScoreFunction() const { return _matchScoreFunc; }
+  IsMatchCandidateFunction getIsMatchCandidate() const { return _isMatchCandidateFunc; }
+  IsWholeGroupFunction getIsWholeGroup() const { return _isWholeGroupFunc; }
+  MatchScoreFunction getMatchScore() const { return _matchScoreFunc; }
   MatchThresholdPtr getMatchThreshold() const { return _matchThreshold; }
-  MergePairFunction getMergePairFunction() const { return _mergePairFunc; }
+  MergePairFunction getMergePair() const { return _mergePairFunc; }
+  MergeSetFunction getMergeSet() const { return _mergeSetFunc; }
   Meters getSearchRadius() const { return _searchRadius; }
   SearchRadiusFunction getSearchRadiusFunction() const { return _searchRadiusFunc; }
 
   void setCriteria(QStringList criteria) { _criteria = criteria; }
-  void setInitFunction(InitFunction func);
-  void setIsMatchCandidateFunction(IsMatchCandidateFunction func);
-  void setMatchScoreFunction(MatchScoreFunction func) { _matchScoreFunc = func; }
+  void setIsMatchCandidate(IsMatchCandidateFunction func);
+  void setIsWholeGroup(IsWholeGroupFunction func) { _isWholeGroupFunc = func; }
+  void setMatchScore(MatchScoreFunction func) { _matchScoreFunc = func; }
   void setMatchThreshold(MatchThresholdPtr threshold) { _matchThreshold = threshold; }
-  void setMergePairFunction(MergePairFunction func) { _mergePairFunc = func; }
+  void setMergePair(MergePairFunction func) { _mergePairFunc = func; }
+  void setMergeSet(MergeSetFunction func) { _mergeSetFunc = func; }
   void setSearchRadius(Meters radius);
   void setSearchRadiusFunction(SearchRadiusFunction func);
 
@@ -88,10 +97,12 @@ private:
   CreatorDescriptionPtr _desc;
   InitFunction _initFunc;
   IsMatchCandidateFunction _isMatchCandidateFunc;
+  IsWholeGroupFunction _isWholeGroupFunc;
 
   MatchScoreFunction _matchScoreFunc;
   MatchThresholdPtr _matchThreshold;
   MergePairFunction _mergePairFunc;
+  MergeSetFunction _mergeSetFunc;
 
   Meters _searchRadius;
   SearchRadiusFunction _searchRadiusFunc;

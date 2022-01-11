@@ -101,6 +101,8 @@ public:
 
   std::vector<ConstMatchPtr>* getMatches() const { return _result; }
 
+  long getNsInIsMatchPython() const { return _nsInIsMatch; }
+
   long getNumMatchCandidatesFound() const;
 
   /**
@@ -133,6 +135,7 @@ private:
   int _elementsEvaluated;
   long _numElementsVisited;
   long _numMatchCandidatesVisited;
+  long _nsInIsMatch;
 
   int _taskStatusUpdateInterval;
   int _memoryCheckUpdateInterval;

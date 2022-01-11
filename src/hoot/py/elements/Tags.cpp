@@ -50,7 +50,11 @@ looking into at some point.
         .def("__str__", &Tags::toString)
         .def("__getitem__", &Tags::get)
         .def("__setitem__", [](Tags& self, QString k, QString v) { self.set(k, v); })
-        .def("to_dict", [](const Tags& tags) { return tags; })
+        .def("to_dict", [](const Tags& tags) {
+            std::map<QString, QString> result;
+            result.insert(tags.keyValueBegin(), tags.keyValueEnd());
+            return result;
+        })
 
         .def_static("className", &Tags::className)
         .def_static("uuidKey", &Tags::uuidKey)
@@ -143,8 +147,9 @@ Get name keys for a set of tags
 R"TOK(
 Return all the names for the current feature.
 
-:param includeAltName: if true, returns names with the alt_name tag key
-)TOK")
+:param include_alt_name: if true, returns names with the alt_name tag key
+)TOK",
+          py::arg("include_alt_name") = true)
 
         .def("getName", &Tags::getName,
 R"TOK(

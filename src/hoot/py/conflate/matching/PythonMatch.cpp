@@ -130,7 +130,9 @@ void PythonMatch::_calculateClassification(const ConstOsmMapPtr& map)
   //   _explainText = ex.getWhat();
   // }
 
-  _p = _pyInfo->getMatchScoreFunction()(map, map->getElement(_eid1), map->getElement(_eid2));
+  auto result = _pyInfo->getMatchScore()(map, map->getElement(_eid1), map->getElement(_eid2));
+  _p = get<0>(result);
+  _explainText = get<1>(result);
 }
 
 set<pair<ElementId, ElementId>> PythonMatch::getMatchPairs() const
@@ -378,6 +380,13 @@ bool PythonMatch::_isOrderedConflicting(
 
 //   return match;
 // }
+
+bool PythonMatch::isWholeGroup() const
+{
+  auto func = _pyInfo->getIsWholeGroup();
+  if (func != nullptr) return func();
+  return false;
+}
 
 // Local<Value> PythonMatch::_call(
 //   const ConstOsmMapPtr& map, Local<Object> mapObj, Local<Object> plugin)

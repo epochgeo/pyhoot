@@ -27,6 +27,9 @@ void init_Status(py::module_& m)
   auto status = py::class_<Status>(m, "Status")
     .def(py::init<>())
     .def(py::init<Status::TypeEnum>())
+    .def("__eq__", [](Status& self, Status& other) { return self == other; })
+    .def("__eq__", [](Status& self, Status::TypeEnum& other) { return self == other; })
+    .def("__str__", &Status::toString)
     .def("getEnum", &Status::getEnum)
     .def("isInput", &Status::isInput, R"TOK(
 getInput Unlike the enumeration names and strings, this returns the zero-based number
@@ -36,7 +39,6 @@ E.g. Unknown1 returns 0, Unknown2 return 1, etc.
 )TOK")
     .def("getInput", &Status::getInput)
     .def("toString", &Status::toString)
-    .def("__str__", &Status::toString)
     .def("toTextStatus", &Status::toTextStatus, R"TOK(
 This is not pretty and it is a copy of "toString".
 It is a lot easier to change this when the users want different text output

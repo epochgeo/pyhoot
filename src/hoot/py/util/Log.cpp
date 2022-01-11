@@ -36,7 +36,11 @@ static void init_Log(py::module_& m)
     .def("getLevelAsString", &Log::getLevelAsString)
     .def("isDebugEnabled", &Log::isDebugEnabled)
     .def("isInfoEnabled", &Log::isInfoEnabled)
-    .def("log", [](Log::WarningLevel level, std::string msg) { Log::getInstance().log(level, msg); })
+    .def_static("log", [](Log::WarningLevel level, std::string msg) { Log::getInstance().log(level, msg); })
+    .def_static("log", [](Log::WarningLevel level, std::string msg, std::string filename,
+      std::string functionName, int lineNumber) {
+      Log::getInstance().log(level, msg, filename, functionName, lineNumber);
+    })
     .def("progress", &Log::progress)
     .def_static ("getWarnMessageLimit", &Log::getWarnMessageLimit)
     .def("getLevel", &Log::getLevel)

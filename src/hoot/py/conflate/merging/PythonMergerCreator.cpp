@@ -112,22 +112,27 @@ bool PythonMergerCreator::createMergers(const MatchSet& matches, vector<MergerPt
 
   std::shared_ptr<PythonMerger> scriptMerger = std::make_shared<PythonMerger>(_pyInfo, eids);
   scriptMerger->setMatchType(matchType.join(";"));
-//  // Only add the merger if there are elements to merge.
-//  if (scriptMerger->hasFunction("mergeSets"))
-//  {
-//    if (eids.size() >= 1)
-//    {
-//      mergers.push_back(scriptMerger);
-//      result = true;
-//    }
-//  }
-//  else
+  // merge set can handle an arbitrarily large number of elements
+  if (_pyInfo->getMergeSet() != nullptr)
   {
+    // Only add the merger if there are elements to merge.
+    if (eids.size() >= 1)
+    {
+      mergers.push_back(scriptMerger);
+      result = true;
+    }
+  }
+  // if the user only has mergePair implemented
+  else
+  {
+    // if there is one pair of elements, we can handle that
     if (eids.size() == 1)
     {
       mergers.push_back(scriptMerger);
       result = true;
     }
+    // multiple pairs of matches can't be handled w/ merge pair, automagically mark it as needing
+    // review.
     else if (eids.size() > 1)
     { 
       LOG_TRACE("Overlapping matches:\n" << eids << "\nmatch types: " << matchType.join(";"));

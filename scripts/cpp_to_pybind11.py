@@ -19,8 +19,8 @@ class_name = sys.argv[2]
 code = re.sub(r"""(?s) +/\*\*""", "R\"TOK(", code)
 code = re.sub(r"""(?ms) +\*/""", ')TOK"', code)
 code = re.sub(r"(?ms)^ +\* ?", "", code)
-code = re.sub(r"""(?ms)(R"TOK.*?TOK")?\s* +(virtual )?(static )?\w+ (\w+)[^\)]+\)( ?const ?)?( ?override ?)?( ?= 0)?(\s*{[^}]+)?[;|}]\s*\n""",
-    rf"""    .def_\3("\4", &{class_name}::\4, \1)\n""", code)
+code = re.sub(r"(?ms)(R\"TOK.*?TOK\")?\s* +(virtual )?(static)? *((const )?[a-zA-Z_:<>]+[&]*) (\w+)\(.*?[;|}]\s*\n",
+    rf"""    .def_\3("\6", &{class_name}::\6, \1)\n""", code)
 code = re.sub(r"""def_\(""", """def(""", code)
 code = re.sub(r""", \)""", """)""", code)
 code = re.sub(r"""(?ms)@param +([^ ]+)""", r":param \1:", code)

@@ -7,6 +7,7 @@ import unittest
 
 import hoot
 
+
 class ExampleGenericPoi:
 
     def init(self, osmMap):
@@ -32,6 +33,7 @@ class ExampleGenericPoi:
     @staticmethod
     def register():
         example = ExampleGenericPoi()
+
         creator = hoot.PythonCreatorDescription()
         creator.description.set_class_name(ExampleGenericPoi.__name__)
         creator.search_radius = 5
@@ -58,7 +60,6 @@ class TestGenericPoi(unittest.TestCase):
 
         # Enable linear programming optimization to avoid an obscure bug
         hoot.conf()["unify.enable.optimal.constrained.matches"] = True
-        hoot.conf()["debug.maps.write"] = True
 
         ExampleGenericPoi.register()
 

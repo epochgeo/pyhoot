@@ -14,10 +14,6 @@
 // hoot
 #include <hoot/core/conflate/matching/MatchThreshold.h>
 #include <hoot/core/conflate/matching/MatchType.h>
-#include <hoot/core/criterion/ChainCriterion.h>
-#include <hoot/core/criterion/NonConflatableCriterion.h>
-#include <hoot/core/criterion/PointCriterion.h>
-#include <hoot/core/criterion/PolygonCriterion.h>
 #include <hoot/core/elements/OsmMap.h>
 #include <hoot/core/io/OsmJsonWriter.h>
 #include <hoot/core/info/CreatorDescription.h>
@@ -101,20 +97,14 @@ void PythonMatchCreator::setConfiguration(const Settings& conf)
   ConfigOptions opts(conf);
 }
 
-QStringList PythonMatchCreator::getCriteria() const
-{
-  auto vec = _creatorInfo->getCriteria();
-  return QStringList(vec.begin(), vec.end());
-}
-
 void PythonMatchCreator::init(const ConstOsmMapPtr& map)
 {
   LOG_TRACE("init");
   LOG_VAR(OsmJsonWriter().toString(map));
-  if (_creatorInfo && _creatorInfo->getInitFunction())
-  {
-    _creatorInfo->getInitFunction()(map);
-  }
+//  if (_creatorInfo && _creatorInfo->getInitFunction())
+//  {
+//    _creatorInfo->getInitFunction()(map);
+//  }
   //_getCachedVisitor(map)->initSearchRadiusInfo();
 }
 
@@ -157,66 +147,11 @@ void PythonMatchCreator::setArguments(const QStringList& args)
 MatchPtr PythonMatchCreator::createMatch(
   const ConstOsmMapPtr& map, ElementId eid1, ElementId eid2)
 {
-  LOG_VART(eid1);
-  LOG_VART(eid2);
-
   // There may be some benefit at some point in caching matches calculated in PythonMatchCreator and
   // accessing that cached information here to avoid extra calls into the JS match script. So far,
   // haven't seen any performance improvement after adding match caching.
 
   assert(false);
-  const bool isPointPolyConflation = false; //_scriptPath.contains(POINT_POLYGON_SCRIPT_NAME);
-  LOG_VART(isPointPolyConflation);
-  bool attemptToMatch = false;
-  ConstElementPtr e1 = map->getElement(eid1);
-  ConstElementPtr e2 = map->getElement(eid2);
-  if (e1 && e2)
-  {
-    if (!isPointPolyConflation)
-    {
-      attemptToMatch = isMatchCandidate(e1, map) && isMatchCandidate(e2, map);
-    }
-    else
-    {
-      if (!_pointPolyPolyCrit)
-      {
-          _pointPolyPolyCrit =
-            std::make_shared<ChainCriterion>(
-              std::make_shared<PolygonCriterion>(map),
-              std::make_shared<NonConflatableCriterion>(map));
-      }
-      if (!_pointPolyPointCrit)
-      {
-          _pointPolyPointCrit =
-            std::make_shared<ChainCriterion>(
-              std::make_shared<PointCriterion>(map),
-              std::make_shared<NonConflatableCriterion>(map));
-      }
-
-      // see related note in PythonMatchCreator::checkForMatch
-      attemptToMatch =
-        (_pointPolyPointCrit->isSatisfied(e1) && _pointPolyPolyCrit->isSatisfied(e2)) ||
-        (_pointPolyPolyCrit->isSatisfied(e1) && _pointPolyPointCrit->isSatisfied(e2));
-    }
-  }
-  LOG_VART(attemptToMatch);
-
-  if (attemptToMatch)
-  {
-    // Isolate* current = v8::Isolate::GetCurrent();
-    // HandleScope handleScope(current);
-    // Context::Scope context_scope(_script->getContext(current));
-
-    // Local<Object> mapJs = OsmMapJs::create(map);
-    // Persistent<Object> plugin(current, PythonMatchCreator::getPlugin(_script));
-
-    // std::shared_ptr<ScriptMatch> match =
-    //   std::make_shared<ScriptMatch>(_script, plugin, map, mapJs, eid1, eid2, getMatchThreshold());
-    // match->setMatchMembers(
-    //   ScriptMatch::geometryTypeToMatchMembers(
-    //     GeometryTypeCriterion::typeToString(_scriptInfo.getGeometryType())));
-    // return match;
-  }
 
   return MatchPtr();
 }
@@ -274,7 +209,6 @@ void PythonMatchCreator::createMatches(
     case CreatorDescription::BaseFeatureType::Highway:
     case CreatorDescription::BaseFeatureType::Building:
     case CreatorDescription::BaseFeatureType::River:
-    case CreatorDescription::BaseFeatureType::PoiPolygonPOI:
     case CreatorDescription::BaseFeatureType::Polygon:
     case CreatorDescription::BaseFeatureType::Area:
     case CreatorDescription::BaseFeatureType::Railway:
@@ -285,6 +219,9 @@ void PythonMatchCreator::createMatches(
       break;
     case CreatorDescription::BaseFeatureType::Relation:
       map->visitRelationsRo(*v);
+      break;
+    case CreatorDescription::BaseFeatureType::PoiPolygonPOI:
+      map->visitRo(*v);
       break;
     default:
       // visit all geometry types if the script didn't identify its geometry
@@ -301,6 +238,8 @@ void PythonMatchCreator::createMatches(
     matchType << " match candidates and " <<
     StringUtils::formatLargeNumber(matchesSizeAfter - matchesSizeBefore) <<
     " total matches in: " << StringUtils::millisecondsToDhms(timer.elapsed()) << ".");
+  LOG_INFO("Spent " << StringUtils::millisecondsToDhms(v->getNsInIsMatchPython() / 1e6) <<
+    " in Python match_score code. ");
 }
 
 vector<CreatorDescription> PythonMatchCreator::getAllCreators() const
@@ -326,9 +265,6 @@ PythonMatchVisitorPtr PythonMatchCreator::_getCachedVisitor(const ConstOsmMapPtr
     LOG_TRACE("Resetting the match candidate checker: " <<
       _creatorInfo->getDescription()->getClassName() << "...");
 
-    LOG_VART(_creatorInfo.get());
-    LOG_VAR(OsmJsonWriter().toString(map));
-    LOG_VART(_creatorInfo.use_count());
     assert(_creatorInfo);
     assert(map);
     PythonMatchVisitor* pmv = new PythonMatchVisitor(map, nullptr, getMatchThreshold(),
@@ -350,6 +286,8 @@ ConstPythonCreatorDescriptionPtr PythonMatchCreator::getCreatorByName(const QStr
   }
   return nullptr;
 }
+
+QStringList PythonMatchCreator::getCriteria() const { return _creatorInfo->getCriteria(); }
 
 bool PythonMatchCreator::isMatchCandidate(ConstElementPtr element, const ConstOsmMapPtr& map)
 {

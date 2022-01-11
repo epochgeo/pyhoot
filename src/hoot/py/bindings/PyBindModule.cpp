@@ -69,12 +69,16 @@ void PyBindModule::remapNames(py::object classToRename)
 
   for (auto it : dict)
   {
-    QString name = QString::fromStdString(py::cast<std::string>(it.first));
-    name.replace(toSnake, "\\1_\\2");
-    name = name.toLower();
-    // we can't really delete the attribute so just null it.
-    classToRename.attr(it.first) = py::none();
-    classToRename.attr(py::str(name.toStdString())) = it.second;
+    QString nameOrig = QString::fromStdString(py::cast<std::string>(it.first));
+    QString snake = nameOrig;
+    snake.replace(toSnake, "\\1_\\2");
+    snake = snake.toLower();
+    if (snake != nameOrig)
+    {
+      // we can't really delete the attribute so just null it.
+      classToRename.attr(it.first) = py::none();
+      classToRename.attr(py::str(snake.toStdString())) = it.second;
+    }
   }
 }
 

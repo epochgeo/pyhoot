@@ -33,6 +33,12 @@ void init_Settings(py::module_& m)
     .def("__setitem__", [](Settings& self, QString k, int v) { return self.set(k, v); })
     .def("__setitem__", [](Settings& self, QString k, bool v) { return self.set(k, v); })
     .def("get", [](const Settings& self, QString key) { return self.getString(key); })
+    .def("getDouble", [](const Settings& self, QString key) {
+      return self.getDouble(key);
+    })
+    .def("getDouble", [](const Settings& self, QString key, double defaultValue) {
+      return self.getDouble(key, defaultValue);
+    })
     .def("set", [](Settings& self, QString k, QString v) { return self.set(k, v); })
     .def("set", [](Settings& self, QString k, double v) { return self.set(k, v); })
     .def("set", [](Settings& self, QString k, int v) { return self.set(k, v); })

@@ -1,11 +1,17 @@
-# MIT License
-# https://opensource.org/licenses/MIT
+# The original code by Maxar/NGA is licensed under GPLv3.
+# 
+# All EpochGeo modifications to the code are licensed under the MIT or at your discretion the
+# GPLv3 license.
 #
+# --------------------------------------------------------------------
+#
+# @copyright Copyright (C) 2015-2021 Maxar (http://www.maxar.com/)
 # @copyright Copyright (C) 2021 EpochGeo LLC (http://www.epochgeo.com/)
 
 import unittest
 
 import hoot
+
 
 class SimpleNameConflator:
 
@@ -115,8 +121,6 @@ class PythonMatchCreatorTest(unittest.TestCase):
 
         reader.set_default_status(hoot.Status(hoot.Status.UNKNOWN1))
         reader.load_from_string(json1, osm_map)
-
-        writer = hoot.OsmJsonWriter()
 
         hoot.UnifyingConflator().apply(osm_map)
 

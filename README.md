@@ -14,6 +14,16 @@ that are requested and no more. A 1:1 mapping will be maintained where possible 
 for Python conventions (e.g. snake_case). If you need a specific feature, please head on over to
 our [GitHub repo](https://github.com/epochgeo/pyhoot) and let us know.
 
+To see a complete list of wrapped code type this from the command line:
+
+```
+python -c "import hoot; help(hoot.libpyhoot)"
+```
+
+Where appropriate conventions are converted from Hoot's c++ coding standard to typical Python
+conventions. E.g. the method `getChildWeight()` is converted either to `get_child_weight()` or
+a property named `child_weight`.
+
 ## Bugs
 
 BEWARE: due to the early stages of this implementation, nearly no testing is run on this build of
@@ -22,11 +32,15 @@ can sometimes have unexpected side effects. If you're running into a strange iss
 is most likely due to pyhoot and should be reported to the pyhoot github first and we will
 escalate to the main hoot repo if needed.
 
-As pyhoot matures and regression tests are put into place, these issues will go away.
+As/if pyhoot matures and regression tests are put into place, these issues will go away.
 
 Known Issues:
 
 1. GLPK gives an unexpected segfault so GLPK based optimization is disabled by default.
+
+## Documentation
+
+Except where Python specific modifications are made, the API docs mimic the C++ docs.
 
 ## Installation
 
@@ -56,7 +70,7 @@ To see what classes and functions are available via pyhoot, use Python's help:
 
 ```
 import hoot
-help(hoot)
+help(hoot.libpyhoot)
 ```
 
 Please see the [Hootenanny documentation](https://github.com/ngageoint/hootenanny/raw/master/docs/HootenannyUserGuide.pdf)

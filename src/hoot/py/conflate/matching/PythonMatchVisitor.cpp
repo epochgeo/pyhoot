@@ -57,6 +57,7 @@ PythonMatchVisitor::PythonMatchVisitor(const ConstOsmMapPtr& map,
   _pyInfo(pyInfo),
   _filter(filter),
   _customSearchRadius(-1.0),
+  _nsInIsMatch(0),
   _neighborCountMax(-1),
   _neighborCountSum(0),
   _elementsEvaluated(0),
@@ -141,13 +142,15 @@ void PythonMatchVisitor::checkForMatch(const ConstElementPtr& e)
 
   _elementsEvaluated++;
 
+  QElapsedTimer timer;
+
   for (ElementId eid : neighbors)
   {
     // don't match from to from
     if (eid == from) continue;
 
     ConstElementPtr e2 = map->getElement(eid);
-    LOG_VAR(e2);
+    LOG_VART(e2);
     LOG_VART(e2->getElementId());
 
     // isCorrectOrder and isMatchCandidate don't apply to Point/Polygon, so we add a different
@@ -163,8 +166,10 @@ void PythonMatchVisitor::checkForMatch(const ConstElementPtr& e)
 
     if (attemptToMatch)
     {
+      timer.restart();
       // Score each candidate and push it on the result vector.
       shared_ptr<PythonMatch> m = make_shared<PythonMatch>(_pyInfo, map, from, eid, _mt);
+      _nsInIsMatch += timer.nsecsElapsed();
       MatchMembers mm;
 
       PointCriterion pointC(map);
@@ -201,53 +206,18 @@ Meters PythonMatchVisitor::getSearchRadius(const ConstElementPtr& e)
   LOG_TRACE("getSearchRadius");
   // See the "Calculating Search Radius" section in the user docs for more information.
 
-  Meters result = 100;
-  // if (_getSearchRadius.IsEmpty())
-  // {
-  //   if (_customSearchRadius < 0)
-  //   {
-  //     // base the radius off of the element itself
-  //     LOG_TRACE("Calculating search radius based off of element...");
-  //     result = e->getCircularError() * _candidateDistanceSigma;
-  //   }
-  //   else
-  //   {
-  //     // base the radius off some predefined radius
-  //     LOG_TRACE("Calculating search radius based off of custom defined script value...");
-  //     result = _customSearchRadius * _candidateDistanceSigma;
-  //   }
-  // }
-  // else
-  // {
-  //   if (_searchRadiusCache.contains(e->getElementId()))
-  //   {
-  //     LOG_TRACE("Retrieving search radius from cache...");
-  //     result = _searchRadiusCache[e->getElementId()];
-  //   }
-  //   else
-  //   {
-  //     LOG_TRACE("Calling getSearchRadius function for: " << _scriptPath << "...");
+  Meters result;
+  auto func = _pyInfo->getSearchRadiusFunction();
 
-  //     Isolate* current = v8::Isolate::GetCurrent();
-  //     HandleScope handleScope(current);
-  //     Context::Scope context_scope(_script->getContext(current));
-  //     Local<Context> context = current->GetCurrentContext();
+  if (func != nullptr)
+  {
+    result = func(e);
+  }
+  else
+  {
+    result = _pyInfo->getSearchRadius();
+  }
 
-  //     Local<Value> jsArgs[1];
-
-  //     int argc = 0;
-  //     jsArgs[argc++] = ElementJs::New(e);
-
-  //     Local<Value> f =
-  //       ToLocal(&_getSearchRadius)->Call(context, getPlugin(), argc, jsArgs).ToLocalChecked();
-
-  //     result = toCpp<Meters>(f) * _candidateDistanceSigma;
-
-  //     _searchRadiusCache[e->getElementId()] = result;
-  //   }
-  // }
-
-  // LOG_VART(result);
   return result;
 }
 
@@ -418,7 +388,7 @@ bool PythonMatchVisitor::isMatchCandidate(ConstElementPtr e)
 
   bool result = false;
 
-  auto func = _pyInfo->getIsMatchCandidateFunction();
+  auto func = _pyInfo->getIsMatchCandidate();
   if (!func)
   {
     throw hoot::IllegalArgumentException("please specify a valid IsMatchCandidate function.");

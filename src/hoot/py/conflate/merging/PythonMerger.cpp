@@ -53,8 +53,8 @@ PythonMerger::PythonMerger(
 
 void PythonMerger::apply(const OsmMapPtr& map, vector<pair<ElementId, ElementId>>& replaced)
 {
-  bool hasMergeSet = false;
-  bool hasMergePair = _pyInfo->getMergePairFunction() != nullptr;
+  bool hasMergeSet = _pyInfo->getMergeSet() != nullptr;
+  bool hasMergePair = _pyInfo->getMergePair() != nullptr;
 
   if (hasMergeSet == hasMergePair)
   {
@@ -122,7 +122,7 @@ void PythonMerger::_applyMergePair(
       "User Documentation_, _Conflating Sets_ for details.");
   }
 
-  ConstElementPtr newElement = _pyInfo->getMergePairFunction()(map, map->getElement(_eid1),
+  ConstElementPtr newElement = _pyInfo->getMergePair()(map, map->getElement(_eid1),
     map->getElement(_eid2));
 
   if (!newElement || map->containsElement(newElement) == false)
@@ -145,44 +145,14 @@ void PythonMerger::_applyMergePair(
 void PythonMerger::_applyMergeSets(
   const OsmMapPtr& map, vector<pair<ElementId, ElementId>>& replaced) const
 {
-  //_callMergeSets(map, replaced);
+  assert(_pyInfo->getMergeSet() != nullptr);
+  assert(map != nullptr);
 
-  // Verify that all the elements are where they need to be (e.g. were removed from the map or
+  auto newReplaced = _pyInfo->getMergeSet()(map, _pairs);
+  replaced.insert(replaced.end(), newReplaced.begin(), newReplaced.end());
+
+  // TODO: Verify that all the elements are where they need to be (e.g. were removed from the map or
   // added to the map as needed).
 }
-
-//void PythonMerger::_callMergeSets(
-//  const OsmMapPtr& map, vector<pair<ElementId, ElementId>>& replaced) const
-//{
-//  Isolate* current = v8::Isolate::GetCurrent();
-//  HandleScope handleScope(current);
-//  Context::Scope context_scope(_script->getContext(current));
-//  Local<Context> context = current->GetCurrentContext();
-
-//  Local<Object> plugin =
-//    Local<Object>::Cast(
-//      _script->getContext(current)->Global()->Get(context, toV8("plugin")).ToLocalChecked());
-//  Local<Value> value = plugin->Get(context, toV8("mergeSets")).ToLocalChecked();
-
-//  if (value.IsEmpty() || value->IsFunction() == false)
-//  {
-//    throw IllegalArgumentException("The merge function 'mergeSets' was not found.");
-//  }
-
-//  Local<Function> func = Local<Function>::Cast(value);
-//  Local<Value> jsArgs[3];
-
-//  int argc = 0;
-//  jsArgs[argc++] = OsmMapJs::create(map);
-//  jsArgs[argc++] = toV8(_pairs);
-//  jsArgs[argc++] = toV8(replaced);
-
-//  TryCatch trycatch(current);
-//  Local<Value> result = func->Call(context, ToLocal(&_plugin), argc, jsArgs).ToLocalChecked();
-//  HootExceptionJs::checkV8Exception(result, trycatch);
-
-//  // Read the replaced values back out.
-//  toCpp(jsArgs[2], replaced);
-//}
 
 }

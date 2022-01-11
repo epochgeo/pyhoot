@@ -66,7 +66,7 @@ public:
     const QHash<QString, 
     hoot::ConstMatchPtr>& matches = QHash<QString, hoot::ConstMatchPtr>()) const override;
 
-  bool isWholeGroup() const override { return _isWholeGroup; }
+  bool isWholeGroup() const override;
 
   /**
    * Returns the two elements that were matched
