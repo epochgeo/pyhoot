@@ -18,8 +18,12 @@
 #include <hoot/core/ops/CopyMapSubsetOp.h>
 #include <hoot/core/util/Factory.h>
 #include <hoot/core/util/Log.h>
-
 #include <hoot/py/conflate/matching/PythonCreatorDescription.h>
+
+// pybind11
+#include <pybind11/functional.h>
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
 
 // Qt
 #include <qnumeric.h>
@@ -29,7 +33,10 @@
 // Standard
 #include <sstream>
 
-using namespace hoot;
+// tgs
+#include <tgs/RandomForest/DataFrame.h>
+
+namespace py = pybind11;
 using namespace std;
 using namespace Tgs;
 
@@ -38,101 +45,20 @@ namespace hoot
 
 HOOT_FACTORY_REGISTER(hoot::Match, PythonMatch)
 
-// void init_PythonMatch(py::module_& m)
-// {
-//     py::class_<PythonMatch>(m, "PythonMatch")
-//         .def(py::init([](const ElementId& eid1, const ElementId& eid2, 
-//             const ConstMatchThresholdPtr& mt) 
-//           { 
-//             return new PythonMatch(eid1, eid2, mt); }))
-//         .def("explain", &PythonMatch::explain)
-//         .def("getName", &PythonMatch::getName)
-//     ;
-// }
-
-// REGISTER_PYHOOT_SUBMODULE(init_PythonMatch)
-
 int PythonMatch::logWarnCount = 0;
 
 PythonMatch::PythonMatch(PythonCreatorDescriptionPtr pyInfo,
   const ConstOsmMapPtr& osmMap,
   const ElementId& eid1,
   const ElementId& eid2,
+  const MatchClassificationPtr& matchClassification,
   const ConstMatchThresholdPtr& mt) :
   Match(mt, eid1, eid2),
   _pyInfo(pyInfo),
+  _p(matchClassification),
   _isWholeGroup(false),
   _neverCausesConflict(false)
 {
-  _calculateClassification(osmMap);
-}
-
-void PythonMatch::_calculateClassification(const ConstOsmMapPtr& map)
-{
-  // Isolate* current = v8::Isolate::GetCurrent();
-  // HandleScope handleScope(current);
-  // Context::Scope context_scope(_script->getContext(current));
-  // Local<Context> context = current->GetCurrentContext();
-
-  // // removing these two lines causes a crash when checking for conflicts. WTF?
-  // Local<Object> global = _script->getContext(current)->Global();
-  // global->Get(context, toV8("plugin"));
-  // if (plugin->Has(context, toV8("isWholeGroup")).ToChecked())
-  // {
-  //   Local<Value> v = _script->call(plugin, "isWholeGroup");
-  //   _isWholeGroup = v->BooleanValue(current);
-  // }
-
-  // if (plugin->Has(context, toV8("neverCausesConflict")).ToChecked())
-  // {
-  //   Local<Value> v = _script->call(plugin, "neverCausesConflict");
-  //   _neverCausesConflict = v->BooleanValue(current);
-  // }
-
-  // Local<String> featureTypeStr = String::NewFromUtf8(current, "baseFeatureType").ToLocalChecked();
-  // if (plugin->Has(context, featureTypeStr).ToChecked())
-  // {
-  //   Local<Value> value = plugin->Get(context, featureTypeStr).ToLocalChecked();
-  //   _matchName = toCpp<QString>(value);
-  // }
-
-  // try
-  // {
-  //   Local<Value> v = _call(map, mapObj, plugin);
-
-  //   if (v.IsEmpty() || v->IsObject() == false)
-  //   {
-  //     throw IllegalArgumentException("Expected matchScore to return an associative array.");
-  //   }
-
-  //   QVariantMap vm = toCpp<QVariantMap>(v);
-  //   // grab the match, miss, review results. If they aren't populated they get a value of 0.
-  //   _p.setMatchP(_script->toNumber(v, "match", 0));
-  //   _p.setMissP(_script->toNumber(v, "miss", 0));
-  //   _p.setReviewP(_script->toNumber(v, "review", 0));
-
-  //   _explainText = vm["explain"].toString();
-  //   if (_explainText.isEmpty())
-  //   {
-  //     _explainText = _threshold->getTypeDetail(_p);
-  //   }
-  //   if (_threshold->getType(_p) == MatchType::Review && _explainText.isEmpty())
-  //   {
-  //     throw IllegalArgumentException(
-  //       "If the match is a review an appropriate explanation must be provided (E.g. "
-  //       "{ 'review': 1, 'explain': 'some reason' }.");
-  //   }
-  // }
-  // catch (const NeedsReviewException& ex)
-  // {
-  //   LOG_VART(ex.getName());
-  //   _p.setReview();
-  //   _explainText = ex.getWhat();
-  // }
-
-  auto result = _pyInfo->getMatchScore()(map, map->getElement(_eid1), map->getElement(_eid2));
-  _p = get<0>(result);
-  _explainText = get<1>(result);
 }
 
 set<pair<ElementId, ElementId>> PythonMatch::getMatchPairs() const
@@ -160,87 +86,6 @@ bool PythonMatch::isConflicting(
 
   bool conflicting = false;
 
-  // const PythonMatch* hm = dynamic_cast<const PythonMatch*>(other.get());
-  // if (hm == nullptr)
-  // {
-  //   return true;
-  // }
-  // if (hm == this)
-  // {
-  //   return false;
-  // }
-
-  // // See ticket #5272
-  // if (getClassification().getReviewP() == 1.0 || other->getClassification().getReviewP() == 1.0)
-  // {
-  //   return true;
-  // }
-
-  // ElementId sharedEid;
-  // if (_eid1 == hm->_eid1 || _eid1 == hm->_eid2)
-  // {
-  //   sharedEid = _eid1;
-  // }
-
-  // if (_eid2 == hm->_eid1 || _eid2 == hm->_eid2)
-  // {
-  //   // both eids should never be the same.
-  //   assert(sharedEid.isNull());
-  //   sharedEid = _eid2;
-  // }
-
-  // // If the matches don't share at least one eid then it isn't a conflict.
-  // if (sharedEid.isNull())
-  // {
-  //   return false;
-  // }
-
-  // // assign o1 and o2 to the non-shared eids
-  // ElementId o1 = _eid1 == sharedEid ? _eid2 : _eid1;
-  // ElementId o2 = hm->_eid1 == sharedEid ? hm->_eid2 : hm->_eid1;
-
-  // bool foundCache = false;
-  // bool cacheConflict = false;
-  // QHash<ConflictKey, bool>::const_iterator cit1 = _conflicts.find(hm->_getConflictKey());
-  // if (cit1 != _conflicts.end())
-  // {
-  //   foundCache = true;
-  //   cacheConflict = cit1.value();
-  // }
-  // QHash<ConflictKey, bool>::const_iterator cit2 = hm->_conflicts.find(_getConflictKey());
-  // if (cit2 != hm->_conflicts.end())
-  // {
-  //   foundCache = true;
-  //   cacheConflict = cit2.value();
-  // }
-
-  // if (foundCache)
-  // {
-  //   conflicting = cacheConflict;
-  // }
-  // else
-  // {
-  //   try
-  //   {
-  //     // We need to check for a conflict in two directions. If its conflicting when we merge the
-  //     // shared EID with this class first, then is it a conflict if we merge with the other EID
-  //     // first.
-  //     if (_isOrderedConflicting(map, sharedEid, o1, o2, matches) ||
-  //         hm->_isOrderedConflicting(map, sharedEid, o2, o1, matches))
-  //     {
-  //       conflicting = true;
-  //     }
-  //     else
-  //     {
-  //       conflicting = false;
-  //     }
-  //   }
-  //   catch (const NeedsReviewException& /*e*/)
-  //   {
-  //     conflicting = true;
-  //   }
-  //   _conflicts[hm->_getConflictKey()] = conflicting;
-  // }
 
   return conflicting;
 
@@ -346,162 +191,27 @@ bool PythonMatch::_isOrderedConflicting(
   return true;
 }
 
-// std::shared_ptr<const PythonMatch> PythonMatch::_getMatch(
-//   OsmMapPtr map, const ElementId& eid1, const ElementId& eid2,
-//   const QHash<QString, ConstMatchPtr>& matches) const
-// {
-//   std::shared_ptr<const PythonMatch> match;
-
-//   QString matchKey;
-//   if (eid1 < eid2)
-//   {
-//     matchKey = eid1.toString() + "," + eid2.toString();
-//   }
-//   else
-//   {
-//     matchKey = eid2.toString() + "," + eid1.toString();
-//   }
-//   QHash<QString, ConstMatchPtr>::const_iterator itr = matches.find(matchKey);
-//   if (itr != matches.end())
-//   {
-//     std::shared_ptr<const PythonMatch> scriptMatch =
-//       std::dynamic_pointer_cast<const PythonMatch>(itr.value());
-//     if (scriptMatch)
-//     {
-//       match = scriptMatch;
-//       LOG_TRACE("Match cache hit for: " << matchKey);
-//     }
-//   }
-
-//   if (!match)
-//   {
-//     match = std::make_shared<PythonMatch>(_script, _plugin, map, mapJs, eid1, eid2, _threshold);
-//   }
-
-//   return match;
-// }
-
 bool PythonMatch::isWholeGroup() const
 {
-  auto func = _pyInfo->getIsWholeGroup();
-  if (func != nullptr) return func();
-  return false;
+  return _pyInfo->isWholeGroup();
 }
-
-// Local<Value> PythonMatch::_call(
-//   const ConstOsmMapPtr& map, Local<Object> mapObj, Local<Object> plugin)
-// {
-//   Isolate* current = v8::Isolate::GetCurrent();
-//   EscapableHandleScope handleScope(current);
-//   Context::Scope context_scope(_script->getContext(current));
-//   Local<Context> context = current->GetCurrentContext();
-
-//   Local<Value> value = plugin->Get(context, toV8("matchScore")).ToLocalChecked();
-//   Local<Function> func = Local<Function>::Cast(value);
-//   Local<Value> jsArgs[3];
-
-//   if (func.IsEmpty() || func->IsFunction() == false)
-//     throw IllegalArgumentException("matchScore must be a valid function.");
-
-//   int argc = 0;
-//   jsArgs[argc++] = mapObj;
-//   jsArgs[argc++] = ElementJs::New(map->getElement(_eid1));
-//   jsArgs[argc++] = ElementJs::New(map->getElement(_eid2));
-
-//   LOG_VART(map->getElement(_eid1).get());
-//   LOG_VART(map->getElement(_eid2).get());
-//   LOG_TRACE("Calling script matcher...");
-
-//   TryCatch trycatch(current);
-//   MaybeLocal<Value> maybe_result = func->Call(context, plugin, argc, jsArgs);
-//   if (maybe_result.IsEmpty())
-//     HootExceptionJs::throwAsHootException(trycatch);
-
-//   Local<Value> result = maybe_result.ToLocalChecked();
-//   HootExceptionJs::checkV8Exception(result, trycatch);
-
-//   return handleScope.Escape(result);
-// }
-
-// Local<Value> PythonMatch::_callGetMatchFeatureDetails(const ConstOsmMapPtr& map) const
-// {
-//   Isolate* current = v8::Isolate::GetCurrent();
-//   EscapableHandleScope handleScope(current);
-//   Context::Scope context_scope(_script->getContext(current));
-//   Local<Context> context = current->GetCurrentContext();
-
-//   Local<Object> plugin =
-//     Local<Object>::Cast(
-//       _script->getContext(current)->Global()->Get(context, toV8("plugin")).ToLocalChecked());
-//   Local<Value> value = plugin->Get(context, toV8("getMatchFeatureDetails")).ToLocalChecked();
-//   Local<Function> func = Local<Function>::Cast(value);
-//   Local<Value> jsArgs[3];
-
-//   if (func.IsEmpty() || func->IsFunction() == false)
-//     throw IllegalArgumentException(
-//       "getMatchFeatureDetails must be a valid function for match from: " + _matchName);
-
-//   Local<Object> mapObj = OsmMapJs::create(map);
-
-//   int argc = 0;
-//   jsArgs[argc++] = mapObj;
-//   jsArgs[argc++] = ElementJs::New(map->getElement(_eid1));
-//   jsArgs[argc++] = ElementJs::New(map->getElement(_eid2));
-
-//   TryCatch trycatch(current);
-//   MaybeLocal<Value> maybe_result = func->Call(context, plugin, argc, jsArgs);
-//   if (maybe_result.IsEmpty())
-//       HootExceptionJs::throwAsHootException(trycatch);
-
-//   Local<Value> result = maybe_result.ToLocalChecked();
-//   HootExceptionJs::checkV8Exception(result, trycatch);
-
-//   return handleScope.Escape(result);
-// }
 
 std::map<QString, double> PythonMatch::getFeatures(const ConstOsmMapPtr& map) const
 {
   std::map<QString, double> result;
-  // LOG_TRACE("Calling getMatchFeatureDetails...");
-  // Local<Value> v = _callGetMatchFeatureDetails(map);
-
-  // if (v.IsEmpty() || v->IsObject() == false)
-  // {
-  //   throw IllegalArgumentException(
-  //     "Expected getMatchFeatureDetails to return an associative array.");
-  // }
-
-  // QVariantMap vm = toCpp<QVariantMap>(v);
-  // long valCtr = 0;
-  // LOG_VART(vm.size());
-  // for (QVariantMap::const_iterator it = vm.begin(); it != vm.end(); ++it)
-  // {
-  //   if (it.value().isNull() == false)
-  //   {
-  //     double d = it.value().toDouble();
-  //     result[it.key()] = d;
-  //     if (::qIsNaN(result[it.key()]))
-  //     {
-  //       if (logWarnCount < Log::getWarnMessageLimit())
-  //       {
-  //         LOG_WARN("found NaN feature value for: " << it.key());
-  //       }
-  //       else if (logWarnCount == Log::getWarnMessageLimit())
-  //       {
-  //         LOG_WARN(className() << ": " << Log::LOG_WARN_LIMIT_REACHED_MESSAGE);
-  //       }
-  //       logWarnCount++;
-  //     }
-  //   }
-  //   valCtr++;
-  // }
-
-  // if (vm.size() > 0)
-  // {
-  //   LOG_DEBUG("Processed " << vm.size() << " sample values.");
-  // }
+  for (unsigned int i = 0; i < _df->getNumFactors(); i++)
+  {
+    QString fname = QString::fromStdString(_df->getFactorLabels()[i]);
+    result[fname] = _df->getDataVector(_dfRow)[i];
+  }
 
   return result;
+}
+
+void PythonMatch::setExtractedData(const Tgs::ConstDataFramePtr& df, unsigned int row)
+{
+  _df = df;
+  _dfRow = row;
 }
 
 QString PythonMatch::toString() const

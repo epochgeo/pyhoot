@@ -1,5 +1,11 @@
 
+*.autosave
 ._*
+.installquick
+.quick
+_build
+auto/
+doxygen/
 CMakeLists.txt.user
 tdp*
 tmp

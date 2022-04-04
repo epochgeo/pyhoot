@@ -15,23 +15,6 @@
 
 namespace py = pybind11;
 
-// Steps for converting C++ headers to bindings:
-//
-// Using regex to replace (ignore left ticks):
-// ` */\*\*` => `R"`
-// ` *\*/` => `"`
-// `^ +\* ?` => ``
-// `(?s)(R".*?")?\s+(static )?\w+ (\w+).+?\)(const )?;` => `        .def_\2("\3", &Tags::\3, \1);\n`
-// `def_\(` => `def\(`
-// `, \);` => `\)`
-// `@(param \w+)` => `:\1:`
-// `@return ` => `:returns: `
-// `\n"\);` => `"\);`
-// `,R"\s*\n` => `,\nR"`
-//
-// This is not perfect but it should save some time on large header files.
-
-
 namespace hoot
 {
 

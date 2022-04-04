@@ -14,6 +14,7 @@ Use help(hoot.libpyhoot) for a complete list of wrapped classes.
 """
 
 import os
+from os.path import exists, join
 
 # Make sure we're using the right hoot home.
 if "HOOT_HOME" in os.environ:
@@ -25,6 +26,19 @@ else:
 # Point ICU data to the hoot conf directory
 if "ICU_DATA" not in os.environ:
     os.environ["ICU_DATA"] = os.path.join(HOOT_HOME, "conf")
+
+# Point proj.db data to the hoot directory
+if "PROJ_LIB" not in os.environ:
+    os.environ["PROJ_LIB"] = HOOT_HOME
+
+if not exists(join(os.environ["ICU_DATA"], "icudt69l.dat")) or \
+    not exists(join(os.environ["PROJ_LIB"], "proj.db")):
+    print("""
+It appears that one or more data files are missing. To download the data files
+run:
+    python -m hoot download-data
+""")
+
 
 # We have to ensure the environment is set properly before importing libpyhoot
 # pylint: disable=wrong-import-position

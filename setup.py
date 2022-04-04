@@ -53,8 +53,7 @@ class CMakeBuild(build_ext):
             os.path.dirname(self.get_ext_fullpath(ext.name)))
         #extdir = os.path.abspath(ext.sourcedir)
         print(f"extdir {extdir}")
-        cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-                      ]
+        cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir]
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
@@ -93,17 +92,29 @@ class CMakeBuild(build_ext):
         os.system(f"find {ext.sourcedir}")
         self.copy_dir(f"{self.build_temp}/conf", f"{lib_dir}/hoot/conf")
         os.system(f"gunzip {lib_dir}/hoot/conf/dictionary/WordsAbridged.sqlite.gz")
+        os.system(f"mv " +\
+                  "{lib_dir}/hoot/conf/dictionary/WordsAbridged.sqlite.gz " + \
+                  "{lib_dir}/hoot/conf/dictionary/Words.sqlite")
 
-        self.copy_dir(f"{self.build_temp}/docs", f"{lib_dir}/hoot/docs", extension="*.asciidoc")
+        self.copy_dir(f"{self.build_temp}/docs", f"{lib_dir}/hoot/docs",
+                      extension="*.asciidoc")
         self.copy_dir(f"{self.build_temp}/rules", f"{lib_dir}/hoot/rules")
         self.copy_dir(f"{self.build_temp}/bin", f"{lib_dir}/hoot/bin")
+        # We don't need HootTest and it is kinda big
+        os.system(f"rm -f {lib_dir}/hoot/bin/HootTest")
         self.copy_dir(f"{self.build_temp}/gdal", f"{lib_dir}/hoot/gdal")
-        copyfile(f"{self.build_temp}/bin/RunHoot.sh", f"{lib_dir}/hoot/bin/hoot")
-        copyfile(f"{self.build_temp}/proj.db", f"{lib_dir}/hoot/proj.db")
-        copyfile(f"{self.build_temp}/res/test-files/ToyTestA.osm", f"{lib_dir}/hoot/ToyTestA.osm")
-        copyfile(f"{self.build_temp}/res/test-files/ToyTestB.osm", f"{lib_dir}/hoot/ToyTestB.osm")
+        copyfile(f"{self.build_temp}/bin/RunHoot.sh",
+                 f"{lib_dir}/hoot/bin/hoot")
         # This needs to be executable.
         os.system(f"chmod +x {lib_dir}/hoot/bin/hoot")
+        # use `python -m hoot download-data` instead
+        # copyfile(f"{self.build_temp}/proj.db", f"{lib_dir}/hoot/proj.db")
+        # copyfile(f"{self.build_temp}/res/icudt69l.dat",
+        #          f"{lib_dir}/hoot/conf/icudt69l.dat")
+        copyfile(f"{self.build_temp}/res/test-files/ToyTestA.osm",
+                 f"{lib_dir}/hoot/ToyTestA.osm")
+        copyfile(f"{self.build_temp}/res/test-files/ToyTestB.osm",
+                 f"{lib_dir}/hoot/ToyTestB.osm")
         print()  # Add an empty line for cleaner output
 
     def copy_dir(self, src, dest, extension=None):
@@ -123,7 +134,8 @@ class CMakeBuild(build_ext):
         '''
         Copy ``src_file`` to ``dest_file`` ensuring parent directory exists.
         By default, message like `creating directory /path/to/package` and
-        `copying directory /src/path/to/package -> path/to/package` are displayed on standard output. Adapted from scikit-build.
+        `copying directory /src/path/to/package -> path/to/package` are 
+        displayed on standard output. Adapted from scikit-build.
         '''
         print(os.path.dirname(src_file))
         # Create directory if needed
@@ -159,14 +171,12 @@ setup(name = 'hoot',
         package_data = {"": [
             "VERSION",
             "libcode.version",
-            "*.h",
-            "*.cpp",
-            "bindings/*",
-            "matching/*",
-            "conflate/*",
-            "elements/*",
-            "info/*",
-            "util/*",
+            "py/*",
+            "py/*/*",
+            "py/*/*/*",
+            "py/*/*/*/*",
+            "py/*/*/*/*/*",
+            "py/*/*/*/*/*/*",
             "*.so",
         ]},
         platforms = "manylinux2014",

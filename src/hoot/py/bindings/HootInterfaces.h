@@ -7,17 +7,21 @@
 #ifndef HOOTINTERFACES_H
 #define HOOTINTERFACES_H
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
 #include <hoot/core/algorithms/extractors/AbstractDistanceExtractor.h>
 #include <hoot/core/algorithms/string/StringDistanceConsumer.h>
+#include <hoot/core/criterion/ElementCriterionConsumer.h>
 #include <hoot/core/elements/ConstOsmMapConsumer.h>
+#include <hoot/core/ops/OsmMapOperation.h>
 #include <hoot/core/util/Configurable.h>
 #include <hoot/core/util/Settings.h>
 
 #include <hoot/py/bindings/QtBindings.h>
 #include <hoot/py/bindings/PyBindModule.h>
+
+// pybind11
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 namespace py = pybind11;
 
@@ -49,6 +53,22 @@ void wrapAbstractDistanceExtractor(Wrapper& wrapper)
         const OsmMap& map, const ConstElementPtr& target, const ConstElementPtr& candidate) {
       return self.distance(map, target, candidate);
     })
+    .def("distance", [](T& self, const OsmMap& map, const std::vector<ConstElementPtr>& target,
+          const std::vector<ConstElementPtr>& candidate) {
+        auto result = py::array_t<double>(target.size());
+        double* resultPtr = static_cast<double*>(result.request().ptr);
+        for (size_t i = 0; i < target.size(); i++)
+        {
+          resultPtr[i] = self.distance(map, target[i], candidate[i]);
+        }
+        return result;
+    }, R"TOK(
+This override to the distance function is pyhoot specific and allows you to calculate distance
+on an array of values in one pass.
+
+Returns:
+    A numpy array of the calculated distances.
+)TOK")
   ;
 }
 
@@ -110,6 +130,52 @@ void wrapConstOsmMapConsumer(Wrapper& wrapper)
       result->setOsmMap(map.get());
       return result;
     }))
+  ;
+}
+
+////
+// Wrap class with ElementCriterionConsumer, if appropriate
+////
+template<class T, typename Wrapper,
+  typename std::enable_if<!std::is_base_of<ElementCriterionConsumer, T>::value, T>::type* = nullptr
+>
+void wrapElementCriterionConsumer(Wrapper& wrapper) {}
+
+template<class T, typename Wrapper,
+  typename std::enable_if<std::is_base_of<ElementCriterionConsumer, T>::value, T>::type* = nullptr
+>
+void wrapElementCriterionConsumer(Wrapper& wrapper)
+{
+  wrapper
+    .def("addCriterion", &ElementCriterionConsumer::addCriterion)
+    .def(py::init([](ElementCriterionPtr crit, py::args args) {
+      auto result = std::make_shared<T>();
+      result->addCriterion(crit);
+      for (auto arg : args)
+      {
+        auto crit = py::cast<ElementCriterionPtr>(arg);
+        result->addCriterion(crit);
+      }
+      return result;
+    }))
+  ;
+}
+
+////
+// Wrap class with OsmMapOperation, if appropriate
+////
+template<class T, typename Wrapper,
+  typename std::enable_if<!std::is_base_of<OsmMapOperation, T>::value, T>::type* = nullptr
+>
+void wrapOsmMapOperationConsumer(Wrapper& wrapper) {}
+
+template<class T, typename Wrapper,
+  typename std::enable_if<std::is_base_of<OsmMapOperation, T>::value, T>::type* = nullptr
+>
+void wrapOsmMapOperationConsumer(Wrapper& wrapper)
+{
+  wrapper
+    .def("apply", &T::apply)
   ;
 }
 
@@ -192,12 +258,46 @@ Construct and set the configuration with a dict of strings and a StringDistance 
   ;
 }
 
+template<class T>
+void registerInterfaces(py::class_<T, std::shared_ptr<T> > wrapme)
+{
+  wrapAbstractDistanceExtractor<T>(wrapme);
+  wrapConfigurable<T>(wrapme);
+  wrapConstOsmMapConsumer<T>(wrapme);
+  wrapElementCriterionConsumer<T>(wrapme);
+  wrapOsmMapOperationConsumer<T>(wrapme);
+  wrapStringDistanceConsumer<T>(wrapme);
+  // StringDistanceConsumer and Configurable are implemented, add another constructor
+  wrapStringDistanceConsumerAndConfigurable<T>(wrapme);
+}
+
+/**
+ * registerClass registers and wraps the provided class (T) with a default constructor and known
+ * interfaces.
+ */
+template<class T>
+py::class_<T, std::shared_ptr<T> > registerClass(py::module_& m)
+{
+  QString className = T::className().replace("hoot::", "");
+  auto result = py::class_<T, std::shared_ptr<T> >
+    (m, className.toUtf8().constData())
+    .def(py::init([]() {
+      return new T();
+    }))
+  ;
+
+  registerInterfaces(result);
+  PyBindModule::remapNames(result);
+
+  return result;
+}
+
 /**
  * registerSubclass registers and wraps the provided class (T) with a default constructor using
  * parent as the base class.
  */
 template<class T, typename Base>
-void registerSubclass(py::module_& m, Base& parent)
+py::class_<T, std::shared_ptr<T> > registerSubclass(py::module_& m, Base& parent)
 {
   QString className = T::className().replace("hoot::", "");
   auto result = py::class_<T, std::shared_ptr<T> >
@@ -206,14 +306,11 @@ void registerSubclass(py::module_& m, Base& parent)
       return new T();
     }))
   ;
-  wrapAbstractDistanceExtractor<T>(result);
-  wrapConfigurable<T>(result);
-  wrapConstOsmMapConsumer<T>(result);
-  wrapStringDistanceConsumer<T>(result);
-  // StringDistanceConsumer and Configurable are implemented, add another constructor
-  wrapStringDistanceConsumerAndConfigurable<T>(result);
 
+  registerInterfaces(result);
   PyBindModule::remapNames(result);
+
+  return result;
 }
 
 }

@@ -29,8 +29,10 @@ void init_OsmSchema(py::module_& m)
 {
     auto osmSchema = py::class_<hoot::OsmSchema, std::unique_ptr<OsmSchema, py::nodelete> >
         (m, "OsmSchema")
-        .def(py::init([]() { return OsmSchema::getInstance(); }))
-        .def_static("getInstance", &OsmSchema::getInstance, R"TOK(
+        .def(py::init([]() { return &OsmSchema::getInstance(); }))
+        .def_static("getInstance",
+          []() { return &OsmSchema::getInstance(); },
+          R"TOK(
 get_instance() is provided for consistency w/ hoot but just calling OsmSchema() gives the same
 result and is more concise.
 )TOK")
@@ -190,7 +192,7 @@ Returns true if this is a list of values. Right now this just looks for a semico
 but in the future the list of valid list keys may be stored in the schema file."
 )TOK")
 
-        .def("all", &OsmSchema::isMetaData,
+        .def("isMetaData", &OsmSchema::isMetaData,
 R"TOK(
 Returns true if the kvp contains metadata about the feature as opposed to real information
 about the features.

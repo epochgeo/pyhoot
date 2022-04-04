@@ -31,6 +31,10 @@ static void init_Log(py::module_& m)
     .def_static("getInstance", []() {
       return std::unique_ptr<Log, py::nodelete>(&Log::getInstance());
     })
+    .def_static ("bad_string", []() {
+      unsigned char result[] = {0x4d, 0x41, 0x4b, 0x53, 0x5c, 0x75, 0x64, 0x38, 0x33, 0x64, 0x5c, 0x75, 0x64, 0x63, 0x39, 0x65, 0x5c, 0x75, 0x64, 0x38, 0x33, 0x64, 0x5c, 0x75, 0x64, 0x63, 0x39, 0x65, 0x00};
+      return QString::fromUtf8((const char*)result);
+    })
     .def_static ("levelFromString", &Log::levelFromString)
     .def_static ("levelToString", &Log::levelToString)
     .def("getLevelAsString", &Log::getLevelAsString)

@@ -23,6 +23,9 @@
 // pybind11
 #include <pybind11/functional.h>
 
+// tgs
+#include <tgs/RandomForest/DataFrame.h>
+
 namespace py = pybind11;
 using namespace std;
 
@@ -34,9 +37,17 @@ void init_PythonCreatorDescription(py::module_& m)
     auto wrapme = py::class_<PythonCreatorDescription, shared_ptr<PythonCreatorDescription> >(
         m, "PythonCreatorDescription")
       .def(py::init<>())
-      .def_property("criteria", &PythonCreatorDescription::getCriteria,
-        &PythonCreatorDescription::setCriteria,
-        "criteria contains a list of criterion names to apply before matching. E.g. PoiCriterion")
+      .def_property("criterion", &PythonCreatorDescription::getCriterion,
+        &PythonCreatorDescription::setCriterion,
+        "Criterion is a criteria to apply to determine if this is a match candidate. E.g. PoiCriterion")
+      .def_property("extract_features", &PythonCreatorDescription::getExtractFeatures,
+        &PythonCreatorDescription::setExtractFeatures, R"TOK(
+The features function returns a map of column names to values. These features can be used to train
+or evaluate a machine learning model.
+
+:param map: OsmMap that contains the match
+:returns: a dict of strings to floats
+)TOK")
       .def_property("is_match_candidate",
         &PythonCreatorDescription::getIsMatchCandidate,
         &PythonCreatorDescription::setIsMatchCandidate,
@@ -117,6 +128,7 @@ PythonCreatorDescription::PythonCreatorDescription()
   LOG_TRACE("PythonCreatorDescription");
   _desc = make_shared<CreatorDescription>();
   _matchThreshold = make_shared<MatchThreshold>();
+  _isWholeGroup = false;
 }
 
 PythonCreatorDescription::~PythonCreatorDescription()
@@ -138,6 +150,12 @@ CreatorDescriptionPtr PythonCreatorDescription::getDescription() { return _desc;
 void PythonCreatorDescription::setIsMatchCandidate(IsMatchCandidateFunction func)
 {
     _isMatchCandidateFunc = func;
+}
+
+void PythonCreatorDescription::setIsWholeGroup(IsWholeGroupFunction func)
+{
+  _isWholeGroupFunc = func;
+  _isWholeGroup = func();
 }
 
 void PythonCreatorDescription::setSearchRadius(Meters radius)

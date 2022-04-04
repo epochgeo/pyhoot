@@ -24,6 +24,9 @@
 #ifndef __QT_BINDINGS_H__
 #define __QT_BINDINGS_H__
 
+// hoot
+#include <hoot/core/util/Log.h>
+
 // pybind11
 #include <pybind11/pybind11.h>
 
@@ -44,25 +47,41 @@ namespace pybind11 {
                 handle load_src = src;
                 if(PyUnicode_Check(load_src.ptr())) {
                     temp = reinterpret_steal<object>(PyUnicode_AsUTF8String(load_src.ptr()));
-                    if (!temp) { PyErr_Clear(); return false; }  // UnicodeEncodeError
+                    if (!temp)
+                    {
+                      LOG_WARN("Unable to encode str as UTF-8")
+                      // UnicodeEncodeError
+                      PyErr_Clear();
+                      return false;
+                    }
                     load_src = temp;
                 }
                 char *buffer;
                 ssize_t length;
                 int err = PYBIND11_BYTES_AS_STRING_AND_SIZE(load_src.ptr(), &buffer, &length);
-                if (err == -1) { PyErr_Clear(); return false; }  // TypeError
+                if (err == -1)
+                {
+                  LOG_WARN("Type error converting string")
+                  // TypeError
+                  PyErr_Clear();
+                  return false;
+                }
                 value = QString::fromUtf8(buffer, (int)length);
                 return true;
             }
 
-            static handle cast(const QString& src, return_value_policy /* policy */, handle /* parent */) {
-#if PY_VERSION_HEX >= 0x03030000    // Python 3.3
-                assert(sizeof(QChar) == 2);
-                return PyUnicode_FromKindAndData(PyUnicode_2BYTE_KIND, src.constData(), src.length());
-#else
+            static handle cast(const QString& src, return_value_policy /* policy */,
+                handle /* parent */) {
+                // this approach should be faster but there are edge cases with unicode escape
+                // sequences.
+//#if PY_VERSION_HEX >= 0x03030000    // Python 3.3
+//                assert(sizeof(QChar) == 2);
+//                return PyUnicode_FromKindAndData(PyUnicode_2BYTE_KIND, src.constData(),
+//                  src.length());
+//#else
                 QByteArray a = src.toUtf8();
                 return PyUnicode_FromStringAndSize(a.data(), (ssize_t)a.length());
-#endif
+//#endif
             }
         };
 
@@ -79,7 +98,8 @@ namespace pybind11 {
                 return true;
             }
 
-            static handle cast(const QStringList& src, return_value_policy /* policy */, handle /* parent */) {
+            static handle cast(const QStringList& src, return_value_policy /* policy */,
+                handle /* parent */) {
                 list lst;
                 for(const QString& s : src)
                     lst.append(pybind11::cast(s));

@@ -20,9 +20,11 @@
 #include <hoot/core/criterion/LinearCriterion.h>
 #include <hoot/core/criterion/NonConflatableCriterion.h>
 #include <hoot/core/criterion/PointCriterion.h>
+#include <hoot/core/elements/MapProjector.h>
 #include <hoot/core/index/OsmMapIndex.h>
 #include <hoot/core/info/CreatorDescription.h>
 #include <hoot/core/util/Log.h>
+#include <hoot/core/util/MemoryUsageChecker.h>
 #include <hoot/core/util/StringUtils.h>
 #include <hoot/core/visitors/SpatialIndexer.h>
 
@@ -56,8 +58,6 @@ PythonMatchVisitor::PythonMatchVisitor(const ConstOsmMapPtr& map,
   _mt(mt),
   _pyInfo(pyInfo),
   _filter(filter),
-  _customSearchRadius(-1.0),
-  _nsInIsMatch(0),
   _neighborCountMax(-1),
   _neighborCountSum(0),
   _elementsEvaluated(0),
@@ -68,6 +68,13 @@ PythonMatchVisitor::PythonMatchVisitor(const ConstOsmMapPtr& map,
   _totalElementsToProcess(0)
 {
   LOG_TRACE("PythonMatchVisitor");
+
+  // TODO remove me, see PythonCreatorDescription::setMatchFromCriterion
+  LOG_WARN("Unknown2 is being ignored during match making. Please fix.")
+  if (!MapProjector::isPlanar(map))
+  {
+    throw HootException("map must be in a planar projection.");
+  }
 
   assert(_mt);
 
@@ -86,30 +93,64 @@ PythonMatchVisitor::PythonMatchVisitor(const ConstOsmMapPtr& map,
   _timer.start();
 }
 
-void PythonMatchVisitor::initSearchRadiusInfo()
+void PythonMatchVisitor::_flushBuffer()
 {
-  LOG_DEBUG("Initializing search radius info...");
+  LOG_DEBUG("_flushBuffer()...");
+  ConstOsmMapPtr map = getMap();
 
-  // _candidateDistanceSigma = getNumber(plugin, "candidateDistanceSigma", 0.0, 1.0);
+  pair<DataFramePtr, vector<bool> > res = _pyInfo->getExtractFeatures()(map, _buffer1, _buffer2);
+  DataFramePtr df = res.first;
+  vector<bool> ignored = res.second;
 
-  // //this is meant to have been set externally in a js rules file
-  // _customSearchRadius =
-  //   getNumber(plugin, "searchRadius", -1.0, ConfigOptions().getCircularErrorDefaultValue());
-  // LOG_VARD(_customSearchRadius);
+  pair< py::array_t<double, 3>, vector<QString> > result = _pyInfo->getMatchScore()(map,
+    _buffer1, _buffer2, df);
+  py::array_t<double, 3>& scores = result.first;
+  vector<QString>& reasons = result.second;
+  assert(_buffer1.size() == reasons.size());
+  assert(_buffer1.size() == scores.size() / 3);
+  PointCriterion pointC(map);
+  LinearCriterion linearC;
+  AreaCriterion areaC(map);
 
-  // Local<Value> value = plugin->Get(context, toV8("getSearchRadius")).ToLocalChecked();
-  // if (value->IsUndefined())
-  // {
-  //   // pass
-  // }
-  // else if (value->IsFunction() == false)
-  // {
-  //   throw HootException("getSearchRadius is not a function.");
-  // }
-  // else
-  // {
-  //   _getSearchRadius.Reset(current, Local<Function>::Cast(value));
-  // }
+  for (size_t i = 0; i < _buffer1.size(); i++)
+  {
+    //_p = get<0>(result);
+    //_explainText = get<1>(result);
+    // skip all the hard ignores
+    if (ignored[i]) continue;
+
+    MatchClassificationPtr matchClassification = make_shared<MatchClassification>(scores.at(i, 0),
+      scores.at(i, 1), scores.at(i, 2));
+
+    ConstElementPtr e1 = _buffer1[i];
+    ConstElementPtr e2 = _buffer2[i];
+
+    // Score each candidate and push it on the result vector.
+    shared_ptr<PythonMatch> m = make_shared<PythonMatch>(_pyInfo, map, e1->getElementId(),
+      e2->getElementId(), matchClassification, _mt);
+    m->setExplanation(reasons[i]);
+    m->setExtractedData(df, i);
+    MatchMembers mm;
+
+    // if we're confident this is not a miss
+    if (m->getType() != MatchType::Miss)
+    {
+      MatchMembers mm;
+      // derive the match members. This differs from the JavaScript interface.
+      if (pointC.isSatisfied(e1)) mm = mm | MatchMembers::Poi;
+      if (linearC.isSatisfied(e1)) mm = mm | MatchMembers::Polyline;
+      if (areaC.isSatisfied(e1)) mm = mm | MatchMembers::Polygon;
+      if (pointC.isSatisfied(e2)) mm = mm | MatchMembers::Poi;
+      if (linearC.isSatisfied(e2)) mm = mm | MatchMembers::Polyline;
+      if (areaC.isSatisfied(e2)) mm = mm | MatchMembers::Polygon;
+
+      m->setMatchMembers(mm);
+      _result->push_back(m);
+    }
+  }
+  _buffer1.clear();
+  _buffer2.clear();
+  LOG_DEBUG("..._flushBuffer()");
 }
 
 QString PythonMatchVisitor::getDescription() const { return ""; }
@@ -121,6 +162,12 @@ void PythonMatchVisitor::checkForMatch(const ConstElementPtr& e)
   LOG_TRACE("checkForMatch");
 
   LOG_VART(e->getElementId());
+
+  // TODO remove me, see PythonCreatorDescription::setMatchFromCriterion
+  if (e->getStatus() == Status::Unknown1)
+  {
+    return;
+  }
 
   ConstOsmMapPtr map = getMap();
 
@@ -137,7 +184,6 @@ void PythonMatchVisitor::checkForMatch(const ConstElementPtr& e)
     "...");
   const set<ElementId> neighbors =
     SpatialIndexer::findNeighbors(*env, getIndex(), _indexToEid, map);
-  LOG_VART(neighbors);
   ElementId from = e->getElementId();
 
   _elementsEvaluated++;
@@ -150,8 +196,12 @@ void PythonMatchVisitor::checkForMatch(const ConstElementPtr& e)
     if (eid == from) continue;
 
     ConstElementPtr e2 = map->getElement(eid);
-    LOG_VART(e2);
-    LOG_VART(e2->getElementId());
+    LOG_VARD(e->getTags().getName());
+    LOG_VARD(e->getElementId());
+    LOG_VARD(e2->getTags().getName());
+    LOG_VARD(e2->getElementId());
+
+
 
     // isCorrectOrder and isMatchCandidate don't apply to Point/Polygon, so we add a different
     // workflow for it here. All other generic scripts use isMatchCandidate to identify both
@@ -159,38 +209,22 @@ void PythonMatchVisitor::checkForMatch(const ConstElementPtr& e)
     // different geometries. See related note in getIndex about Point/Polygon.
 
     bool attemptToMatch = false;
-    LOG_VART(isCorrectOrder(e, e2));
-    LOG_VART(isMatchCandidate(e2));
-    attemptToMatch = isCorrectOrder(e, e2) && isMatchCandidate(e2);
-    LOG_VART(attemptToMatch);
+    LOG_VARD(isCorrectOrder(e, e2));
+    LOG_VARD(isMatchCandidate(e2));
+    // TODO fix me, see PythonCreatorDescription::setMatchFromCriterion
+    attemptToMatch = (e2->getStatus() == Status::Unknown1 || isCorrectOrder(e, e2)) &&
+      isMatchCandidate(e2);
+    LOG_VARD(attemptToMatch);
 
     if (attemptToMatch)
     {
       timer.restart();
-      // Score each candidate and push it on the result vector.
-      shared_ptr<PythonMatch> m = make_shared<PythonMatch>(_pyInfo, map, from, eid, _mt);
-      _nsInIsMatch += timer.nsecsElapsed();
-      MatchMembers mm;
 
-      PointCriterion pointC(map);
-      LinearCriterion linearC;
-      AreaCriterion areaC(map);
-
-      // if we're confident this is not a miss
-      if (m->getType() != MatchType::Miss)
+      _buffer1.push_back(e);
+      _buffer2.push_back(e2);
+      if (_buffer1.size() >= getMaxElementsInBuffer())
       {
-        MatchMembers mm;
-        // derive the match members. This differs from the JavaScript interface.
-        if (pointC.isSatisfied(e)) mm = mm | MatchMembers::Poi;
-        if (linearC.isSatisfied(e)) mm = mm | MatchMembers::Polyline;
-        if (areaC.isSatisfied(e)) mm = mm | MatchMembers::Polygon;
-        if (pointC.isSatisfied(e2)) mm = mm | MatchMembers::Poi;
-        if (linearC.isSatisfied(e2)) mm = mm | MatchMembers::Polyline;
-        if (areaC.isSatisfied(e2)) mm = mm | MatchMembers::Polygon;
-
-        m->setMatchMembers(mm);
-        LOG_VART(m->toString());
-        _result->push_back(m);
+        _flushBuffer();
       }
     }
   }
@@ -211,7 +245,15 @@ Meters PythonMatchVisitor::getSearchRadius(const ConstElementPtr& e)
 
   if (func != nullptr)
   {
-    result = func(e);
+    if (_searchRadiusCache.contains(e->getElementId()))
+    {
+      result = _searchRadiusCache[e->getElementId()];
+    }
+    else
+    {
+      result = func(e);
+      _searchRadiusCache[e->getElementId()] = result;
+    }
   }
   else
   {
@@ -219,64 +261,6 @@ Meters PythonMatchVisitor::getSearchRadius(const ConstElementPtr& e)
   }
 
   return result;
-}
-
-void PythonMatchVisitor::calculateSearchRadius()
-{
-  LOG_TRACE("calculateSearchRadius");
-  // // This is meant to run one time when the match creator is initialized. We're either getting
-  // // the search radius from a predefined property linked to a config option in the conflate rules
-  // // file or we're calculating it with a function call from the rules file. Either way, then we're
-  // // caching it after the first retrieval.
-
-  // LOG_DEBUG("Checking for existence of search radius export for: " << _scriptPath << "...");
-
-  // Isolate* current = v8::Isolate::GetCurrent();
-  // HandleScope handleScope(current);
-  // Context::Scope context_scope(_script->getContext(current));
-  // Local<Context> context = current->GetCurrentContext();
-
-  // Persistent<Object> plugin(current, getPlugin(_script));
-  // Local<String> initStr = String::NewFromUtf8(current, "calculateSearchRadius").ToLocalChecked();
-  // // optional method, so don't throw an error
-  // if (ToLocal(&plugin)->Has(context, initStr).ToChecked() == false)
-  // {
-  //   LOG_TRACE("calculateSearchRadius function not present.");
-  //   return;
-  // }
-  // Local<Value> value = ToLocal(&plugin)->Get(context, initStr).ToLocalChecked();
-  // if (value->IsFunction() == false)
-  // {
-  //   LOG_TRACE("calculateSearchRadius function not present.");
-  //   return;
-  // }
-
-  // LOG_DEBUG("Getting search radius for: " << _scriptPath << "...");
-
-  // Local<Function> func = Local<Function>::Cast(value);
-  // Local<Value> jsArgs[1];
-  // int argc = 0;
-  // assert(getMap().get());
-  // OsmMapPtr copiedMap = make_shared<OsmMap>(getMap());
-  // jsArgs[argc++] = OsmMapJs::create(copiedMap);
-
-  // Local<Value> c = func->Call(context, ToLocal(&plugin), argc, jsArgs).ToLocalChecked();
-  // LOG_DEBUG("Return value: " << c);
-
-  // // This could be an expensive call.
-  // _customSearchRadius =
-  //   getNumber(
-  //     ToLocal(&plugin), "searchRadius", -1.0, ConfigOptions().getCircularErrorDefaultValue());
-
-  // QFileInfo scriptFileInfo(_scriptPath);
-  // LOG_DEBUG(
-  //   "Search radius of: " << _customSearchRadius << " to be used for: " <<
-  //   scriptFileInfo.fileName());
-}
-
-void PythonMatchVisitor::cleanMapCache()
-{
-  LOG_TRACE("cleanMapCache");
 }
 
 shared_ptr<HilbertRTree>& PythonMatchVisitor::getIndex()
@@ -287,8 +271,7 @@ shared_ptr<HilbertRTree>& PythonMatchVisitor::getIndex()
     LOG_INFO("Creating script feature index for: " << _pyInfo->getDescription()->getClassName() <<
       "...");
 
-    // No tuning was done, just copied these settings from OsmMapIndex. 10 children - 368 - see
-    // #3054
+    // Not tuned
     _index = make_shared<Tgs::HilbertRTree>(make_shared<Tgs::MemoryPageStore>(728), 2);
 
     // Only index elements that satisfy the isMatchCandidate. Previously we only indexed Unknown2,
@@ -314,6 +297,7 @@ shared_ptr<HilbertRTree>& PythonMatchVisitor::getIndex()
     {
       case CreatorDescription::BaseFeatureType::POI:
       case CreatorDescription::BaseFeatureType::Point:
+        LOG_DEBUG("visit nodes");
         osmMap->visitNodesRo(v);
         break;
       case CreatorDescription::BaseFeatureType::Highway:
@@ -325,11 +309,17 @@ shared_ptr<HilbertRTree>& PythonMatchVisitor::getIndex()
       case CreatorDescription::BaseFeatureType::Railway:
       case CreatorDescription::BaseFeatureType::PowerLine:
       case CreatorDescription::BaseFeatureType::Line:
+        LOG_DEBUG("visit lines");
         osmMap->visitWaysRo(v);
         osmMap->visitRelationsRo(v);
         break;
       case CreatorDescription::BaseFeatureType::Relation:
+        LOG_DEBUG("visit relations");
         osmMap->visitRelationsRo(v);
+        break;
+      case CreatorDescription::BaseFeatureType::Unknown:
+        LOG_DEBUG("visit all");
+        osmMap->visitRo(v);
         break;
       default:
         // visit all geometry types if the script didn't identify its geometry
@@ -376,24 +366,33 @@ bool PythonMatchVisitor::isCorrectOrder(const ConstElementPtr& e1, const ConstEl
 bool PythonMatchVisitor::isMatchCandidate(ConstElementPtr e)
 {
   LOG_TRACE("isMatchCandidate");
-  if (_matchCandidateCache.contains(e->getElementId()))
-  {
-    return _matchCandidateCache[e->getElementId()];
-  }
-
-  if (_filter && !_filter->isSatisfied(e))
-  {
-    return false;
-  }
-
   bool result = false;
 
-  auto func = _pyInfo->getIsMatchCandidate();
-  if (!func)
+  if (_matchCandidateCache.contains(e->getElementId()))
   {
-    throw hoot::IllegalArgumentException("please specify a valid IsMatchCandidate function.");
+    result = _matchCandidateCache[e->getElementId()];
   }
-  result = func(_map.lock(), e);
+  else if (_filter && !_filter->isSatisfied(e))
+  {
+    result = false;
+  }
+  else
+  {
+    auto func = _pyInfo->getIsMatchCandidate();
+    if (!func)
+    {
+      result = true;
+    }
+    else
+    {
+      // TODO replace isMatchCandidate with a bulk operation
+      result = func(_map.lock(), vector<ConstElementPtr>{e});
+      _matchCandidateCache[e->getElementId()] = result;
+    }
+  }
+  LOG_VARD(e->getTags().getName());
+  LOG_VARD(e->getElementId());
+  LOG_VARD(result);
 
   return result;
 }
@@ -406,85 +405,17 @@ void PythonMatchVisitor::visit(const ConstElementPtr& e)
     checkForMatch(e);
 
     _numMatchCandidatesVisited++;
-    // if (_numMatchCandidatesVisited % (_taskStatusUpdateInterval * 100) == 0)
-    // {
-    //   PROGRESS_DEBUG(
-    //     "\tProcessed " << StringUtils::formatLargeNumber(_numMatchCandidatesVisited) <<
-    //     " match candidates / " << StringUtils::formatLargeNumber(_totalElementsToProcess) <<
-    //     " total elements.");
-    // }
+    //if (_numMatchCandidatesVisited % (_taskStatusUpdateInterval * 100) == 0)
+    if (_numMatchCandidatesVisited % 128 == 0)
+    {
+      PROGRESS_STATUS(
+        "\tProcessed " << StringUtils::formatLargeNumber(_numMatchCandidatesVisited) <<
+        " match candidates / " << StringUtils::formatLargeNumber(_totalElementsToProcess) <<
+        " total elements.");
+    }
   }
-
-  // if matching gets slow, throttle the log update interval accordingly.
-  if (_timer.elapsed() > 3000 && _taskStatusUpdateInterval >= 10)
-  {
-    _taskStatusUpdateInterval /= 10;
-  }
-  else if (_timer.elapsed() < 250 && _taskStatusUpdateInterval < 10000)
-  {
-    _taskStatusUpdateInterval *= 10;
-  }
-
-  _numElementsVisited++;
-  // if (_numElementsVisited % _taskStatusUpdateInterval == 0)
-  // {
-  //   PROGRESS_STATUS(
-  //     "\tProcessed " << StringUtils::formatLargeNumber(_numElementsVisited) << " of " <<
-  //     StringUtils::formatLargeNumber(_totalElementsToProcess) << " elements.");
-  //    _timer.restart();
-  // }
-  // if (_numElementsVisited % _memoryCheckUpdateInterval == 0)
-  // {
-  //   MemoryUsageChecker::getInstance().check();
-  // }
 }
-
-Meters PythonMatchVisitor::getCustomSearchRadius() const { return _customSearchRadius; }
-void PythonMatchVisitor::setCustomSearchRadius(Meters searchRadius) 
-{
-  LOG_TRACE("setCustomSearchRadius");
-  _customSearchRadius = searchRadius;
-}
-
-double PythonMatchVisitor::getCandidateDistanceSigma() const { return _candidateDistanceSigma; }
-void PythonMatchVisitor::setCandidateDistanceSigma(double sigma)
-{
-  LOG_TRACE("setCandidateDistanceSigma");
-  _candidateDistanceSigma = sigma;
-}
-
-// CreatorDescription PythonMatchVisitor::getCreatorDescription() const { return _pyInfo; }
-// void PythonMatchVisitor::setCreatorDescription(const CreatorDescription& description)
-// {
-//   _scriptInfo = description;
-
-//   if (_scriptPath.toLower().contains("relation")) // hack
-//   {
-//     _totalElementsToProcess = getMap()->getRelationCount();
-//   }
-//   else
-//   {
-//     switch (_scriptInfo.getGeometryType())
-//     {
-//       case GeometryTypeCriterion::GeometryType::Point:
-//         _totalElementsToProcess = getMap()->getNodeCount();
-//         break;
-//       case GeometryTypeCriterion::GeometryType::Line:
-//         _totalElementsToProcess = getMap()->getWayCount() + getMap()->getRelationCount();
-//         break;
-//       case GeometryTypeCriterion::GeometryType::Polygon:
-//         _totalElementsToProcess = getMap()->getWayCount() + getMap()->getRelationCount();
-//         break;
-//       default:
-//         // visit all geometry types if the script didn't identify its geometry
-//         _totalElementsToProcess = getMap()->size();
-//         break;
-//     }
-//   }
-// }
 
 long PythonMatchVisitor::getNumMatchCandidatesFound() const { return _numMatchCandidatesVisited; }
-
-// bool hasCustomSearchRadiusFunction() const { return !_getSearchRadius.IsEmpty(); }
 
 }

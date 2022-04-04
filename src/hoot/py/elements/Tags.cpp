@@ -51,9 +51,13 @@ looking into at some point.
         .def("__getitem__", &Tags::get)
         .def("__setitem__", [](Tags& self, QString k, QString v) { self.set(k, v); })
         .def("to_dict", [](const Tags& tags) {
-            std::map<QString, QString> result;
-            result.insert(tags.keyValueBegin(), tags.keyValueEnd());
-            return result;
+          std::map<QString, QString> result;
+          result.insert(tags.keyValueBegin(), tags.keyValueEnd());
+          return result;
+        })
+        .def("clone", [](const Tags& tags) {
+          Tags result = tags;
+          return result;
         })
 
         .def_static("className", &Tags::className)

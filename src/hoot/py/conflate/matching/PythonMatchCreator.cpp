@@ -54,11 +54,15 @@ HOOT_FACTORY_REGISTER(MatchCreator, PythonMatchCreator)
 
 void init_PythonMatchCreator(py::module_& m)
 {
+    auto matchCreator = py::class_<MatchCreator, shared_ptr<MatchCreator> >(m, "MatchCreator");
+
     auto wrapme = py::class_<PythonMatchCreator, shared_ptr<PythonMatchCreator> >(m,
-        "PythonMatchCreator")
+        "PythonMatchCreator", matchCreator)
       .def(py::init([]() { return make_shared<PythonMatchCreator>(); }))
       .def_static("clear", &PythonMatchCreator::clear)
       .def("init", &PythonMatchCreator::init)
+      .def("getCreatorByName", &PythonMatchCreator::getCreatorByName,
+"getCreatorByName returns the creator python info for a specified name.")
       .def("getName", &PythonMatchCreator::getName)
       .def_static("registerCreator", &PythonMatchCreator::registerCreator)
       .def("setArguments", [](PythonMatchCreator& self, vector<QString> strs) {
@@ -150,10 +154,7 @@ MatchPtr PythonMatchCreator::createMatch(
   // There may be some benefit at some point in caching matches calculated in PythonMatchCreator and
   // accessing that cached information here to avoid extra calls into the JS match script. So far,
   // haven't seen any performance improvement after adding match caching.
-
-  assert(false);
-
-  return MatchPtr();
+  return nullptr;
 }
 
 void PythonMatchCreator::createMatches(
@@ -230,6 +231,8 @@ void PythonMatchCreator::createMatches(
       map->visitRo(*v);
       break;
   }
+  // call this just in case there is some cleanup or unfinished matches
+  v->finalizeMatches();
 
   const int matchesSizeAfter = matches.size();
 
@@ -238,8 +241,6 @@ void PythonMatchCreator::createMatches(
     matchType << " match candidates and " <<
     StringUtils::formatLargeNumber(matchesSizeAfter - matchesSizeBefore) <<
     " total matches in: " << StringUtils::millisecondsToDhms(timer.elapsed()) << ".");
-  LOG_INFO("Spent " << StringUtils::millisecondsToDhms(v->getNsInIsMatchPython() / 1e6) <<
-    " in Python match_score code. ");
 }
 
 vector<CreatorDescription> PythonMatchCreator::getAllCreators() const
@@ -267,6 +268,10 @@ PythonMatchVisitorPtr PythonMatchCreator::_getCachedVisitor(const ConstOsmMapPtr
 
     assert(_creatorInfo);
     assert(map);
+    if (_filter == nullptr)
+    {
+      _filter = _creatorInfo->getCriterion();
+    }
     PythonMatchVisitor* pmv = new PythonMatchVisitor(map, nullptr, getMatchThreshold(),
         _creatorInfo, _filter);
     _visitor.reset(pmv);
@@ -287,7 +292,13 @@ ConstPythonCreatorDescriptionPtr PythonMatchCreator::getCreatorByName(const QStr
   return nullptr;
 }
 
-QStringList PythonMatchCreator::getCriteria() const { return _creatorInfo->getCriteria(); }
+QStringList PythonMatchCreator::getCriteria() const
+{
+  // it would be nice to return the user register criterion but that doesn't work within this
+  // interface.
+  return QStringList{"PoiCriterion", "AreaCriterion"};
+  //return _creatorInfo->getCriterion();
+}
 
 bool PythonMatchCreator::isMatchCandidate(ConstElementPtr element, const ConstOsmMapPtr& map)
 {

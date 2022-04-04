@@ -34,12 +34,14 @@ find_package(Python3 3.6 EXACT COMPONENTS Development)
 list(REMOVE_ITEM CONAN_LIBS
     wayland-server wayland-cursor wayland-egl wayland-client 
     Qt5Gui
-    X11 X11-xcb xcb fontenc ICE SM Xau Xaw7 Xt Xcomposite Xcursor Xdamage Xfixes Xdmcp Xext Xft Xi Xinerama xkbfile Xmu Xmuu Xpm Xrandr Xrender XRes Xss Xtst Xv XvMC Xxf86vm xcb-xkb xcb-icccm xcb-image xcb-shm xcb-keysyms xcb-randr xcb-render xcb-render-util xcb-shape xcb-sync xcb-xfixes xcb-xinerama xcb-util xcb-dri3
+    X11 X11-xcb xcb fontenc ICE SM Xau Xaw7 Xt Xcomposite Xcursor Xdamage
+    Xfixes Xdmcp Xext Xft Xi Xinerama xkbfile Xmu Xmuu Xpm Xrandr Xrender XRes
+    Xss Xtst Xv XvMC Xxf86vm xcb-xkb xcb-icccm xcb-image xcb-shm xcb-keysyms
+    xcb-randr xcb-render xcb-render-util xcb-shape xcb-sync xcb-xfixes
+    xcb-xinerama xcb-util xcb-dri3
 )
 list(APPEND CONAN_LIBS libqsqlite.a)
 link_directories({$CONAN_QT_ROOT}/bin/archdatadir/plugins/sqldrivers/)
-
-#set(CONAN_LIBS HootCore)
 
 set(PYHOOT_HOME ${CMAKE_CURRENT_LIST_DIR})
 
@@ -62,10 +64,11 @@ target_include_directories(
 target_link_libraries(
     pyhoot
     HootJs
-    HootTest
+    #HootTest
+    HootCore
     ${Python3_LIBRARIES}
     ${CONAN_LIBS}
-    ${CONAN_LIBS_HOOTENANNY}
+    #${CONAN_LIBS_HOOTENANNY}
 )
 target_precompile_headers(
     pyhoot
@@ -79,5 +82,6 @@ file(COPY ${CONAN_HOOTENANNY_ROOT}/docs DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CONAN_HOOTENANNY_ROOT}/gdal DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CONAN_HOOTENANNY_ROOT}/proj.db DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CONAN_HOOTENANNY_ROOT}/res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CONAN_ICU_ROOT}/res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CONAN_QT_ROOT}/bin/archdatadir/plugins/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/)
 

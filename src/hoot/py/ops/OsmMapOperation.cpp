@@ -6,8 +6,10 @@
  */
 
 // hoot
+#include <hoot/core/ops/MapCleaner.h>
 #include <hoot/core/ops/RecursiveElementRemover.h>
 #include <hoot/core/ops/ReplaceElementOp.h>
+#include <hoot/core/ops/SuperfluousNodeRemover.h>
 
 // pybind11
 #include <pybind11/pybind11.h>
@@ -15,6 +17,7 @@
 // pyhoot
 #include <hoot/py/bindings/PyBindModule.h>
 #include <hoot/py/bindings/QtBindings.h>
+#include <hoot/py/bindings/HootInterfaces.h>
 
 namespace py = pybind11;
 
@@ -42,6 +45,9 @@ static void init_ConstOsmMapOperation(py::module_& m)
     .def(py::init([](ElementId eid1, ElementId eid2) { return new ReplaceElementOp(eid1, eid2); }))
   ;
   PyBindModule::remapNames(replaceElementOp);
+
+  registerClass<SuperfluousNodeRemover>(m);
+  registerClass<MapCleaner>(m);
 }
 
 REGISTER_PYHOOT_SUBMODULE(init_ConstOsmMapOperation)

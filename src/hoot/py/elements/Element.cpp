@@ -52,7 +52,7 @@ confidence interval assuming a normal distribution.
     .def("getStatusString", &Element::getStatusString)
     .def("getTag", &Element::getTag)
     .def("getTags", [](const Element& self) { return self.getTags(); })
-    .def("getTags", static_cast<Tags& (Element::*)()>(&Element::getTags))
+    .def("getTags", [](Element& self) { return self.getTags(); })
     .def("getTagCount", &Element::getTagCount)
     .def("getTimestamp", &Element::getTimestamp)
     .def("getUid", &Element::getUid)

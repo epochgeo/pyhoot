@@ -52,7 +52,7 @@ class PythonCreatorDescription;
 using PythonCreatorDescriptionPtr = std::shared_ptr<PythonCreatorDescription>;
 
 /**
- * Searches the specified map for any match potentials.
+ * Searches the specified map for match candidates.
  */
 class PythonMatchVisitor : public ConstElementVisitor
 {
@@ -64,7 +64,11 @@ public:
 
   ~PythonMatchVisitor() override = default;
 
-  void initSearchRadiusInfo();
+  /**
+   * finalizeMatches finalizes any outstanding matches that may need to be evaluated due to
+   * buffering. This _must_ be called after all elements have been processed with visit().
+   */
+  void finalizeMatches() { _flushBuffer(); }
 
   QString getDescription() const override;
   QString getName() const override;
@@ -74,11 +78,24 @@ public:
 
   ConstOsmMapPtr getMap() const;
 
+  /**
+   * getMaxElementsInBuffer returns the maximum number of elements that should be stored up between
+   * vectorized calls to python.
+   */
+  int getMaxElementsInBuffer() const { return 10000; }
+
+  /**
+   * getSearchRadius returns the search radius that should be used for e.
+   *
+   * This will call a user python script, if necessary. The result is cached so it can be called
+   * repeatedly as needed.
+   */
   Meters getSearchRadius(const ConstElementPtr& e);
 
-  void calculateSearchRadius();
-  void cleanMapCache();
-
+  /**
+   * getIndex builds the index (if needed) and returns the result. This will only contain element
+   * that return true for isMatchCandidate().
+   */
   std::shared_ptr<Tgs::HilbertRTree>& getIndex();
 
   /**
@@ -89,20 +106,23 @@ public:
    *  - Gives a consistent ordering to allow backwards compatibility with system tests.
    */
   bool isCorrectOrder(const ConstElementPtr& e1, const ConstElementPtr& e2) const;
+
+  /**
+   * isMatchCandidate returns true if e is a match candidate. If necessary, the user provided
+   * python method will be called. The result is cached so it can be called repeatedly.
+   */
   bool isMatchCandidate(ConstElementPtr e);
 
   void visit(const ConstElementPtr& e) override;
-
-  double getCandidateDistanceSigma() const;
-  void setCandidateDistanceSigma(double sigma);
 
   Meters getCustomSearchRadius() const;
   void setCustomSearchRadius(Meters searchRadius);
 
   std::vector<ConstMatchPtr>* getMatches() const { return _result; }
 
-  long getNsInIsMatchPython() const { return _nsInIsMatch; }
-
+  /**
+   * getNumMatchCandidatesFound returns the number of match candidates that were visited.
+   */
   long getNumMatchCandidatesFound() const;
 
   /**
@@ -116,6 +136,11 @@ public:
 
 private:
 
+  std::vector<ConstElementPtr> _buffer1;
+  std::vector<ConstElementPtr> _buffer2;
+
+  std::vector<ConstElementPtr> _isCandidate;
+
   // Don't hold on to the map.
   std::weak_ptr<const OsmMap> _map;
 
@@ -126,16 +151,11 @@ private:
 
   ElementCriterionPtr _filter;
 
-  // used for automatic search radius calculation; it is expected that this is set from the
-  // Javascript rules file used for the generic conflation
-  double _customSearchRadius;
-
   int _neighborCountMax;
   int _neighborCountSum;
   int _elementsEvaluated;
   long _numElementsVisited;
   long _numMatchCandidatesVisited;
-  long _nsInIsMatch;
 
   int _taskStatusUpdateInterval;
   int _memoryCheckUpdateInterval;
@@ -160,6 +180,8 @@ private:
   QString _scriptPath;
 
   std::set<ElementId> _empty;
+
+  void _flushBuffer();
 };
 
 }

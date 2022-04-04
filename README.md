@@ -49,7 +49,7 @@ At this time, pyhoot is only available for Python 3.6.
 Installing on CentOS 7:
 
 ```
-sudo yum install libSM libX11 
+sudo yum install libSM libX11 lzma-sdk-dev
 python3 -m pip install hoot
 ```
 

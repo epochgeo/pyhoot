@@ -18,6 +18,13 @@
 #include <hoot/core/conflate/matching/MatchDetails.h>
 #include <hoot/core/conflate/matching/MatchClassification.h>
 
+namespace Tgs
+{
+  class DataFrame;
+  using ConstDataFramePtr = std::shared_ptr<const DataFrame>;
+  using DataFramePtr = std::shared_ptr<DataFrame>;
+}
+
 namespace hoot
 {
 
@@ -46,12 +53,15 @@ public:
   PythonMatch() = default;
   PythonMatch(PythonCreatorDescriptionPtr pyInfo,
     const ConstOsmMapPtr& osmMap,
-    const hoot::ElementId& eid1,
-    const hoot::ElementId& eid2,
-    const hoot::ConstMatchThresholdPtr& mt);
+    const ElementId& eid1,
+    const ElementId& eid2,
+    const MatchClassificationPtr& matchClassification,
+    const ConstMatchThresholdPtr& mt);
   ~PythonMatch() override = default;
 
   const MatchClassification& getClassification() const override { return *_p; }
+
+  std::map<QString, double> getFeatures(const hoot::ConstOsmMapPtr& map) const override;
 
   hoot::MatchMembers getMatchMembers() const override { return _matchMembers; }
   void setMatchMembers(const hoot::MatchMembers& matchMembers) { _matchMembers = matchMembers; }
@@ -73,17 +83,31 @@ public:
    */
   std::set<std::pair<hoot::ElementId, hoot::ElementId>> getMatchPairs() const override;
 
-  QString toString() const override;
+  /**
+   * setExtractedData sets a row of data that has been extracted to create this match.
+   *
+   * @param df is the DataFrame that contains the row of data.
+   * @param row is the row index in df that contains this match's supporting data.
+   */
+  void setExtractedData(const Tgs::ConstDataFramePtr& df, unsigned int row);
 
-  std::map<QString, double> getFeatures(const hoot::ConstOsmMapPtr& map) const override;
+  QString toString() const override;
 
   QString getClassName() const override { return className(); }
   QString getDescription() const override
   { return "Matches elements using Generic Conflation via Javascript"; }
 
+  void setExplanation(const QString& ex) { _explainText = ex; }
+
 private:
 
   friend class PythonMatchTest;
+
+  /// _df is a dataframe that contains the extracted features for this match. This is optionally
+  /// set with setExtractedData.
+  Tgs::ConstDataFramePtr _df;
+  /// _dfRow is the row that contains extracted data in _df.
+  unsigned int _dfRow;
 
   bool _isWholeGroup;
   MatchMembers _matchMembers;
