@@ -38,10 +38,6 @@ Known Issues:
 
 1. GLPK gives an unexpected segfault so GLPK based optimization is disabled by default.
 
-## Documentation
-
-Except where Python specific modifications are made, the API docs mimic the C++ docs.
-
 ## Installation
 
 At this time, pyhoot is only available for Python 3.6.

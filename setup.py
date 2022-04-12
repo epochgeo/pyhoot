@@ -88,6 +88,7 @@ class CMakeBuild(build_ext):
         print([f"{self.build_temp}/lib/libpyhoot.so", f"{lib_dir}/hoot/libpyhoot.so"])
         # When creating a local development pip install, this won't exist
         if os.path.exists(f"{self.build_temp}/lib/libpyhoot.so"):
+            os.system(f"mkdir -p {lib_dir}/hoot")
             copyfile(f"{self.build_temp}/lib/libpyhoot.so", f"{lib_dir}/hoot/libpyhoot.so")
         os.system(f"find {ext.sourcedir}")
         self.copy_dir(f"{self.build_temp}/conf", f"{lib_dir}/hoot/conf")
@@ -162,8 +163,17 @@ setup(name = 'hoot',
         ext_modules = [CMakeExtension("hoot/hoot")],
         extras_require = {
             "dev": [
-                "unittest",
                 "setuptools",
+                "auditwheel",
+                "setuptools",
+                # For building API docs
+                "sphinx",
+                "sphinx-markdown-builder",
+                "sphinx-autodoc-typehints",
+                "conan",
+                "build",
+                "twine",
+                "pydoc-markdown",
             ]
         },
         packages = find_packages("src"),

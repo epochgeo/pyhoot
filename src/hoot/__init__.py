@@ -42,7 +42,10 @@ run:
 
 # We have to ensure the environment is set properly before importing libpyhoot
 # pylint: disable=wrong-import-position
-from .libpyhoot import * # noqa
+try:
+    from .libpyhoot import * # noqa
+except:
+    from hoot.libpyhoot import *
 from .utils import * # noqa
 from .hoot_pythonic import * # noqa
 

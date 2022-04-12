@@ -3,10 +3,14 @@
 ._*
 .installquick
 .quick
+.vscode
 _build
 auto/
+docs/*.log
+docs/*.pdf
 doxygen/
 CMakeLists.txt.user
+lib64
 tdp*
 tmp
 centos8
@@ -15,6 +19,9 @@ dist
 conanbuildinfo.cmake
 conanbuildinfo.txt
 graph_info.json
+sphinx/_*
+venv*/
+.venv*/
 
 conan.lock
 conaninfo.txt

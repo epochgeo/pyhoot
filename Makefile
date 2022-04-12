@@ -1,7 +1,7 @@
 
 #
-# This makefile contains a number of utility methods for developing and maintaining
-# pyhoot. E.g. build, update on pypi, etc.
+# This makefile contains a number of utility methods for developing and 
+# maintaining pyhoot. E.g. build, update on pypi, etc.
 #
 
 
@@ -17,6 +17,7 @@ clean:
 	rm -rf $(FINAL_WHEEL)
 	rm -rf build
 	rm -f .quick .installquick .install
+	$(MAKE) -C sphinx clean
 
 build_wheel: $(FINAL_WHEEL)
 
@@ -24,6 +25,21 @@ build_wheel: $(FINAL_WHEEL)
 test: local build/conf/dictionary/words.sqlite
 	HOOT_HOME=`pwd`/build PYTHONPATH=`pwd`/build/lib/:`pwd`/src/ \
 		python -m unittest discover -s tests.hoot
+
+docs: docs/PyHootManual.pdf
+
+docs/PyHootManual.pdf: docs/710_api_documentation.md
+	cd docs; pandoc \
+	--number-sections \
+	--toc \
+	-V colorlinks \
+	-V links-as-notes \
+	*.md --output PyHootManual.pdf
+
+# The configuration for this is in sphinx/
+docs/710_api_documentation.md: .force
+	$(MAKE) -C sphinx markdown
+	cp sphinx/_build/markdown/hoot.md docs/710_api_documentation.md
 
 # do a quick install that won't test the final version
 quick: ._quick
