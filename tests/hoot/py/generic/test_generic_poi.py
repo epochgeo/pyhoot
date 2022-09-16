@@ -10,9 +10,6 @@ import hoot
 
 class ExampleGenericPoi:
 
-    def init(self, osmMap):
-        print("init!")
-
     def is_match_candidate(self, osmMap, element):
         return True
 
@@ -37,11 +34,10 @@ class ExampleGenericPoi:
         creator = hoot.PythonCreatorDescription()
         creator.description.set_class_name(ExampleGenericPoi.__name__)
         creator.search_radius = 5
-        creator.criteria = ["PoiCriterion"]
-        creator.init_function = example.init
-        creator.is_match_candidate_function = example.is_match_candidate
-        creator.match_score_function = example.match_score
-        creator.merge_pair_function = example.merge_pair
+        creator.criterion = hoot.PoiCriterion()
+        creator.is_match_candidate = example.is_match_candidate
+        creator.match_score = example.match_score
+        creator.merge_pair = example.merge_pair
 
         hoot.PythonMatchCreator.register_creator(creator)
         hoot.PythonMergerCreator.register_creator(creator)

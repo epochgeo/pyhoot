@@ -19,8 +19,6 @@ import hoot
 
 import tdp
 
-tdp.WifiConflator.register()
-
 if __name__ == "__main__":
     if len(sys.argv) > 3 and sys.argv[1] == "env":
         if sys.argv[2] == "home":
@@ -73,4 +71,11 @@ if __name__ == "__main__":
     #BINARY_PATH = str(os.path.join(hoot.HOOT_HOME, "bin/hoot"))
     #sys.exit(subprocess.run([BINARY_PATH] + sys.argv[1:], check=True).
     #         returncode)
-    hoot.Command.run(sys.argv[1], sys.argv[2:])
+
+    cmd = ""
+    if len(sys.argv) >= 2:
+        cmd = sys.argv[1]
+    args = []
+    if len(sys.argv) >= 3:
+        args = sys.argv[2:]
+    hoot.Command.run(cmd, args)

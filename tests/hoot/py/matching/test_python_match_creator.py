@@ -15,9 +15,6 @@ import hoot
 
 class SimpleNameConflator:
 
-    def init(self, osmMap):
-        print("init!")
-
     def is_match_candidate(self, osmMap, element):
         return True
 
@@ -50,13 +47,12 @@ class PythonMatchCreatorTest(unittest.TestCase):
         hoot.conf()["debug.maps.write"] = True
 
         creator = hoot.PythonCreatorDescription()
-        creator.criteria = ["PoiCriterion"]
+        creator.criterion = hoot.PoiCriterion()
         creator.description.set_class_name("SimpleNameConflator")
         creator.search_radius = 5
-        creator.init_function = foo.init
-        creator.is_match_candidate_function = foo.is_match_candidate
-        creator.match_score_function = foo.match_score
-        creator.merge_pair_function = foo.merge_pair
+        creator.is_match_candidate = foo.is_match_candidate
+        creator.match_score = foo.match_score
+        creator.merge_pair = foo.merge_pair
 
         hoot.PythonMatchCreator.register_creator(creator)
         hoot.PythonMergerCreator.register_creator(creator)
@@ -122,6 +118,9 @@ class PythonMatchCreatorTest(unittest.TestCase):
         reader.set_default_status(hoot.Status(hoot.Status.UNKNOWN1))
         reader.load_from_string(json1, osm_map)
 
+        hoot.MapProjector.project_to_planar(osm_map)
+        hoot.warn(osm_map.to_json())
+        hoot.warn(hoot.UnifyingConflator().get_name())
         hoot.UnifyingConflator().apply(osm_map)
 
         hoot.MapProjector.project_to_wgs84(osm_map)
@@ -150,5 +149,5 @@ class PythonMatchCreatorTest(unittest.TestCase):
 """
         expected_map = hoot.load_json(expected,
                                       default_status=hoot.Status.CONFLATED)
-        print(hoot.to_json(osm_map))
+        hoot.warn(hoot.to_json(osm_map))
         self.assertTrue(hoot.MapComparator().is_match(osm_map, expected_map))

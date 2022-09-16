@@ -8,6 +8,9 @@
 #include <pybind11/pybind11.h>
 
 #include <hoot/core/elements/Element.h>
+#include <hoot/core/elements/ElementProvider.h>
+#include <hoot/core/elements/Relation.h>
+#include <hoot/core/visitors/ConstElementVisitor.h>
 
 #include <hoot/py/bindings/QtBindings.h>
 #include <hoot/py/bindings/PyBindModule.h>
@@ -125,6 +128,132 @@ Compares information tags with another element
 // :param recursive: if true, child elements are visited
     ;
   PyBindModule::remapNames(element);
+
+  // This is a lazy wrapping of Relation. All the functions have been wrapped to some degree but
+  // the more difficult functions have been commented out.
+  auto relation = py::class_<hoot::Relation, std::shared_ptr<Relation> >(m, "Relation", element)
+    .def_static("className", &Relation::className)
+    // .def("addElement", &Relation::addElement)
+    // .def("addElement", &Relation::addElement)
+    // .def("addElement", &Relation::addElement)
+    .def("insertElement", &Relation::insertElement, R"TOK(
+Inserts a relation member
+
+:param role: role of the member
+:param elementId: ID of the member
+:param pos: position in the relation to insert the member
+)TOK")
+//     .def("removeElement", &Relation::removeElement, R"TOK(
+// Remove all members that meet the specified criteria. If no members meet the criteria then
+// no changes are made.
+// )TOK")
+//     .def("removeElement", &Relation::removeElement)
+//     .def("removeElement", &Relation::removeElement)
+//     .def("replaceElement", &Relation::replaceElement, R"TOK(
+// Replaces all instances of from in the relation with to. If from is not in the relation then
+// no changes are made.
+// )TOK")
+//     .def("replaceElement", &Relation::replaceElement)
+//     .def("replaceElement", &Relation::replaceElement)
+    .def("clear", &Relation::clear, R"TOK(
+Removes members, tags, type and circularError.
+)TOK")
+    .def("getMembers", [](const Relation& self) { return self.getMembers(); })
+    .def("getMembers", &Relation::getMembers)
+    .def("getMemberCount", &Relation::getMemberCount)
+    .def("getMember", &Relation::getMember)
+    .def("setMembers", &Relation::setMembers)
+    .def("contains", &Relation::contains, R"TOK(
+Returns true if this relation contains the specified ElementId. This does not recursively
+search for the element.
+)TOK")
+    .def("indexOf", &Relation::indexOf, R"TOK(
+Finds the index of a member
+
+:param eid: ID of the relation member
+:returns: a numerical index
+)TOK")
+    .def("memberIdAt", &Relation::memberIdAt, R"TOK(
+Retrieves the relation member element at a specified index
+
+:param index: the index to retrieve the element member from
+:returns: a valid element, if found; an invalid element otherwise
+)TOK")
+    .def("isFirstMember", &Relation::isFirstMember, R"TOK(
+Determines if the first relation member has a specified ID
+
+:param eid: the element ID to search for
+:returns: true if an element having the specified ID is contained at the first relation member
+location; false otherwise
+)TOK")
+    .def("isLastMember", &Relation::isLastMember, R"TOK(
+Determines if the last relation member has a specified ID
+
+:param eid: the element ID to search for
+:returns: true if an element having the specified ID is contained at the last relation member
+location; false otherwise
+)TOK")
+    .def("getMemberIds", [](const Relation& self) { return self.getMemberIds(); })
+    .def("getMemberIds", &Relation::getMemberIds, R"TOK(
+Returns the IDs of members
+
+:param elementType: optional element type of element Ids to return
+:returns: a collection of element IDs
+)TOK")
+    .def("getAdjoiningMemberIds", &Relation::getAdjoiningMemberIds, R"TOK(
+Retrieves the member element IDs for members placed immediately before and after the member
+element with the specified ID
+
+:param memberId: the ID of the member element to retrieve adjoining member element IDs for
+:returns: If a member with the specified ID exists 1) and is neither the first nor last member, a
+list with two elements IDs where the first ID is the ID of the member element directly
+preceding the element with the specified ID and the second ID is the ID of the member directly
+succeeding the element with the specified ID. 2) and is the first member, a list with one
+element ID where the ID is the ID of the member directly succeeding the element with the
+specified ID. 3) and is the last member, a list with one element ID where the ID is the ID of
+the member directly preceding the element with the specified ID. If the relation contains no
+member with the specified ID, then an empty list is returned.
+)TOK")
+    .def("numElementsByRole", &Relation::numElementsByRole, R"TOK(
+Returns the number of member elements with the given relation role
+
+:param role: role by which to examine elements
+:returns: the number of member elements with the specified role
+)TOK")
+    .def("getElementsByRole", &Relation::getElementsByRole, R"TOK(
+Retrieves all members with a particular role
+
+:param role: role to search for
+:returns: a collection of members
+)TOK")
+    .def("getRole", &Relation::getRole)
+    .def("getEnvelope", &Relation::getEnvelope)
+    .def("getEnvelopeInternal", &Relation::getEnvelopeInternal)
+    .def("getElementType", &Relation::getElementType)
+    .def("getType", &Relation::getType)
+    .def("isMultiPolygon", &Relation::isMultiPolygon, R"TOK(
+Returns true if this is a multipolygon type. No checking is done to determine if the geometry
+is valid.
+)TOK")
+    .def("isReview", &Relation::isReview, R"TOK(
+Returns true if this is a review.
+)TOK")
+    .def("isRestriction", &Relation::isRestriction)
+    .def("setType", &Relation::setType, R"TOK(
+Sets the "type" of the relation. See the OSM wiki [1] for a detailed description. Example
+types include "building", "multipolygon" and "multilinestring".
+
+1. http://wiki.openstreetmap.org/wiki/Relation
+)TOK")
+    .def("toString", &Relation::toString)
+    .def("visitRo", &Relation::visitRo, R"TOK(
+@see Element
+)TOK")
+    .def("visitRw", &Relation::visitRw, R"TOK(
+@see Element
+)TOK")
+    ;
+  PyBindModule::remapNames(relation);
 }
 
 REGISTER_PYHOOT_SUBMODULE(init_Element)

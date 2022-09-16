@@ -13,6 +13,7 @@
 #include <hoot/core/criterion/NotCriterion.h>
 #include <hoot/core/criterion/NoInformationCriterion.h>
 #include <hoot/core/criterion/OrCriterion.h>
+#include <hoot/core/criterion/PoiCriterion.h>
 #include <hoot/core/criterion/PointCriterion.h>
 #include <hoot/core/criterion/PolygonCriterion.h>
 #include <hoot/core/criterion/TagCriterion.h>
@@ -65,6 +66,7 @@ Returns:
     .def(py::init([](ElementCriterionPtr e) { return make_shared<NotCriterion>(e); }))
   ;
   registerSubclass<NoInformationCriterion>(m, wrapme);
+  registerSubclass<PoiCriterion>(m, wrapme);
   registerSubclass<PointCriterion>(m, wrapme);
   registerSubclass<PolygonCriterion>(m, wrapme);
   auto tagCrit = registerSubclass<TagCriterion>(m, wrapme);
