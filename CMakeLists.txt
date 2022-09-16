@@ -3,6 +3,8 @@ project(hoot)
 
 add_definitions("-std=c++11")
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 message(${CMAKE_CURRENT_BINARY_DIR})
 message(${CMAKE_CURRENT_LIST_DIR})
 
@@ -64,7 +66,7 @@ target_include_directories(
 target_link_libraries(
     pyhoot
     HootJs
-    #HootTest
+    HootTest
     HootCore
     ${Python3_LIBRARIES}
     ${CONAN_LIBS}

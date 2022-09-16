@@ -376,11 +376,11 @@ R"TOK(Returns the tags as key/value pair strings
 :returns: a list of key/value pairs
 )TOK")
 
-        .def("toKeys", &Tags::toKeys, 
-R"TOK(
-toKeys returns the tags as a list of key strings
-:returns: a list of key strings
-)TOK")
+        //.def("toKeys", &Tags::toKeys, 
+//R"TOK(
+//toKeys returns the tags as a list of key strings
+//:returns: a list of key strings
+//)TOK")
 
 
         .def("hasAnyKey", &Tags::hasAnyKey, 

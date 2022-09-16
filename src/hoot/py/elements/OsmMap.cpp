@@ -110,7 +110,7 @@ removed from this OsmMap entirely.
 )TOK")
     .def("createNextNodeId", &OsmMap::createNextNodeId)
     .def("visitNodesRo", &OsmMap::visitNodesRo)
-    .def("visitNodesRw", &OsmMap::visitNodesRw)
+    //.def("visitNodesRw", &OsmMap::visitNodesRw)
     .def("numNodesAppended", &OsmMap::numNodesAppended)
     .def("numNodesSkippedForAppending", &OsmMap::numNodesSkippedForAppending)
   ///////////////////////////////////////WAY////////////////////////////////////////////////
