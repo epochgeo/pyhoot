@@ -100,3 +100,18 @@ The Hootenanny CLI is conveniently wrapped in a python call:
 ```
 python -m hoot help
 ```
+
+## Development Environment
+
+Follow Hootenanny Conan install instructions [here](https://github.com/epochgeo/hootenanny-conan#install).
+
+Then:
+```
+source /opt/rh/devtoolset-8/enable
+export HOOT_HOME=/home/vagrant/pyhoot/build/
+PYTHON_CONFIGURE_OPTS="--enable-shared --with-pic" pyenv install --force 3.6.8
+cd pyhoot
+pip install -e .
+python -m hoot download-data
+make -j$(nproc) test
+```
