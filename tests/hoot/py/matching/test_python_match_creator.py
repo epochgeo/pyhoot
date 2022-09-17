@@ -9,29 +9,51 @@
 # @copyright Copyright (C) 2021 EpochGeo LLC (http://www.epochgeo.com/)
 
 import unittest
+import numpy as np
 
 import hoot
-
 
 class SimpleNameConflator:
 
     def is_match_candidate(self, osmMap, element):
         return True
 
-    def match_score(self, map, element1, element2):
-        return hoot.MatchClassification(1, 0, 0)
+    def extract_features(self, osm_map, elements1, elements2):
+        df = hoot.DataFrame()
+        ignored = np.zeros(shape=(len(elements1),), dtype=np.bool)
+        return (df, ignored)
+
+    def match_score(self, map, element1, element2, df):
+
+        MATCHI = 0
+        MISSI = 1
+        REVIEWI = 2
+
+        result = np.zeros((len(element1), 3))
+        result[0, MATCHI] = 1
+        result[0, MISSI] = 0
+        result[0, REVIEWI] = 0
+        reasons = ["todo"] * len(element1)
+        return (result, reasons)
 
     def merge_pair(self, map, element1, element2):
-        new_tags = hoot.TagMergerFactory.merge_tags(element1.get_tags(),
-                                                    element2.get_tags())
-        element1.set_tags(new_tags)
-        element1.set_status(hoot.Status.CONFLATED)
 
-        hoot.ReplaceElementOp(element1.get_element_id(),
-                              element2.get_element_id()).apply(map)
-        hoot.RecursiveElementRemover(element2.get_element_id()).apply(map)
-        return element1
+        # element1 doesn't necessarily have status=Unknown1.
+        keep_element = element1
+        discard_element = element2
+        if element1.get_status() == hoot.Status.UNKNOWN2:
+            keep_element = element2
+            discard_element = element1
 
+        new_tags = hoot.TagMergerFactory.merge_tags(keep_element.get_tags(),
+                                                    discard_element.get_tags())
+        keep_element.set_tags(new_tags)
+        keep_element.set_status(hoot.Status.CONFLATED)
+
+        hoot.ReplaceElementOp(discard_element.get_element_id(),
+                              keep_element.get_element_id()).apply(map)
+        hoot.RecursiveElementRemover(discard_element.get_element_id()).apply(map)
+        return keep_element
 
 class PythonMatchCreatorTest(unittest.TestCase):
 
@@ -45,12 +67,14 @@ class PythonMatchCreatorTest(unittest.TestCase):
         # Enable linear programming optimization to avoid an obscure bug
         hoot.conf()["unify.enable.optimal.constrained.matches"] = True
         hoot.conf()["debug.maps.write"] = True
+        hoot.conf()["tag.merger.default"] = "OverwriteTag2Merger"
 
         creator = hoot.PythonCreatorDescription()
         creator.criterion = hoot.PoiCriterion()
         creator.description.set_class_name("SimpleNameConflator")
         creator.search_radius = 5
         creator.is_match_candidate = foo.is_match_candidate
+        creator.extract_features = foo.extract_features
         creator.match_score = foo.match_score
         creator.merge_pair = foo.merge_pair
 
@@ -112,18 +136,21 @@ class PythonMatchCreatorTest(unittest.TestCase):
         reader.set_use_data_source_ids(False)
 
         # match one feature against itself.
+        reader.set_default_status(hoot.Status(hoot.Status.UNKNOWN1))
+        reader.load_from_string(json1, osm_map)
         reader.set_default_status(hoot.Status(hoot.Status.UNKNOWN2))
         reader.load_from_string(json2, osm_map)
 
-        reader.set_default_status(hoot.Status(hoot.Status.UNKNOWN1))
-        reader.load_from_string(json1, osm_map)
+        hoot.warn("loaded map: " + osm_map.to_json())
 
         hoot.MapProjector.project_to_planar(osm_map)
-        hoot.warn(osm_map.to_json())
-        hoot.warn(hoot.UnifyingConflator().get_name())
+        
+        hoot.info(hoot.UnifyingConflator().get_name())
         hoot.UnifyingConflator().apply(osm_map)
 
         hoot.MapProjector.project_to_wgs84(osm_map)
+
+        hoot.warn("conflated map: " + osm_map.to_json())
 
         expected = """
 {
@@ -136,7 +163,7 @@ class PythonMatchCreatorTest(unittest.TestCase):
     "elements": [
         {
             "type": "node",
-            "id": -2,
+            "id": -1,
             "lat": 2.0,
             "lon": -3.000001,
             "tags": {
@@ -149,5 +176,5 @@ class PythonMatchCreatorTest(unittest.TestCase):
 """
         expected_map = hoot.load_json(expected,
                                       default_status=hoot.Status.CONFLATED)
-        hoot.warn(hoot.to_json(osm_map))
+        hoot.warn("expected map: " + expected_map.to_json())
         self.assertTrue(hoot.MapComparator().is_match(osm_map, expected_map))
