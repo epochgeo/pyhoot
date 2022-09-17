@@ -141,7 +141,7 @@ class PythonMatchCreatorTest(unittest.TestCase):
         reader.set_default_status(hoot.Status(hoot.Status.UNKNOWN2))
         reader.load_from_string(json2, osm_map)
 
-        hoot.warn("loaded map: " + osm_map.to_json())
+        #hoot.warn("loaded map: " + osm_map.to_json())
 
         hoot.MapProjector.project_to_planar(osm_map)
         
@@ -150,7 +150,7 @@ class PythonMatchCreatorTest(unittest.TestCase):
 
         hoot.MapProjector.project_to_wgs84(osm_map)
 
-        hoot.warn("conflated map: " + osm_map.to_json())
+        #hoot.warn("conflated map: " + osm_map.to_json())
 
         expected = """
 {
@@ -176,5 +176,5 @@ class PythonMatchCreatorTest(unittest.TestCase):
 """
         expected_map = hoot.load_json(expected,
                                       default_status=hoot.Status.CONFLATED)
-        hoot.warn("expected map: " + expected_map.to_json())
+        #hoot.warn("expected map: " + expected_map.to_json())
         self.assertTrue(hoot.MapComparator().is_match(osm_map, expected_map))
