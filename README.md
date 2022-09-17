@@ -103,9 +103,9 @@ python -m hoot help
 
 ## Development Environment
 
-Follow Hootenanny Conan install instructions [here](https://github.com/epochgeo/hootenanny-conan#install).
+Follow the [Hootenanny Conan install instructions](https://github.com/epochgeo/hootenanny-conan#install).
 
-Then:
+Then, install pyhoot and run the tests:
 ```
 source /opt/rh/devtoolset-8/enable
 export HOOT_HOME=/home/vagrant/pyhoot/build/
