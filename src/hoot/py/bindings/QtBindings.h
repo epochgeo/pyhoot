@@ -51,6 +51,7 @@ namespace pybind11 {
                     {
                       LOG_WARN("Unable to encode str as UTF-8")
                       // UnicodeEncodeError
+                      PyErr_Print();
                       PyErr_Clear();
                       return false;
                     }
@@ -63,6 +64,7 @@ namespace pybind11 {
                 {
                   LOG_WARN("Type error converting string")
                   // TypeError
+                  PyErr_Print();
                   PyErr_Clear();
                   return false;
                 }

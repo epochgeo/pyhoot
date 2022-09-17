@@ -149,7 +149,7 @@ CreatorDescriptionPtr PythonCreatorDescription::getDescription() { return _desc;
 
 void PythonCreatorDescription::setIsMatchCandidate(IsMatchCandidateFunction func)
 {
-    _isMatchCandidateFunc = func;
+  _isMatchCandidateFunc = func;
 }
 
 void PythonCreatorDescription::setIsWholeGroup(IsWholeGroupFunction func)

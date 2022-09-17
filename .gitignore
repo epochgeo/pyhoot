@@ -156,3 +156,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+src/hoot/conf/
+src/hoot/proj.db
