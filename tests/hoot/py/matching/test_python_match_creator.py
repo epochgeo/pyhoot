@@ -36,6 +36,7 @@ class SimpleNameConflator:
         reasons = ["todo"] * len(element1)
         return (result, reasons)
 
+    # TODO: This can probably be moved to a util method.
     def merge_pair(self, map, element1, element2):
 
         # element1 doesn't necessarily have status=Unknown1.
