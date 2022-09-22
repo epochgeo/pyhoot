@@ -121,4 +121,4 @@ Optionally, you can install Visual Studio Code and set up a terminal pointing to
 * Run `vagrant ssh-config` from the directory where you launched the pyhoot VM.
 * Paste the output from the previous command to `~/.ssh/config`. 
 * Rename the entry from `default` to something unique.
-* Create a terminal connection pointing to the entries name within VS Code.
+* Create a terminal connection pointing to the config file entry's name within VS Code.
