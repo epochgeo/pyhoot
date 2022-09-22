@@ -17,6 +17,8 @@ clean:
 	rm -rf $(FINAL_WHEEL)
 	rm -rf build
 	rm -f .quick .installquick .install
+	rm -f conanbuildinfo*
+	rm -f conan.lock
 	$(MAKE) -C sphinx clean
 
 build_wheel: $(FINAL_WHEEL)
