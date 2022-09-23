@@ -26,14 +26,7 @@ build_wheel: $(FINAL_WHEEL)
 # Run pyhoot unit tests on a local build of pyhoot.
 test: local build/conf/dictionary/words.sqlite
 	HOOT_HOME=`pwd`/build PYTHONPATH=`pwd`/build/lib/:`pwd`/src/ \
-	# Very strange that after upgrading to py 3.7 that not all the tests get picked up by 
-	# discovery...so specifying them explicitly...will fix later.
-	#python -m unittest discover -s tests/hoot/py/
-	# temp ignore py warnings
-	python -W ignore -m unittest tests/hoot/py/generic/test_generic_poi.py \
-		tests/hoot/py/matching/test_python_match_creator.py \
-		tests/hoot/py/test/test_conflate_case.py \
-		tests/hoot/py/visitors/test_element_osm_map_visitor.py
+	python -W ignore -m unittest discover -s tests/hoot/py
 
 docs: docs/PyHootManual.pdf
 
@@ -70,7 +63,7 @@ install: ._install
 
 testfinal: ._install
 	python -m hoot conflate tmp/ToyTestA.osm tmp/ToyTestA.osm tmp/ToyTestOut.osm
-	python -m unittest discover -s tests.hoot
+	python -W ignore -m unittest discover -s tests/hoot/py
 
 $(FINAL_WHEEL): dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
     # For some reason it can't find libjvm w/o LD_LIBRARY_PATH being specified.

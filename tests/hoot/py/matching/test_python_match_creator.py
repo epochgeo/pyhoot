@@ -67,8 +67,8 @@ class PythonMatchCreatorTest(unittest.TestCase):
         hoot.OsmMap.reset_counters()
 
         # Enable linear programming optimization to avoid an obscure bug
-        hoot.conf()["unify.enable.optimal.constrained.matches"] = True
-        hoot.conf()["debug.maps.write"] = True
+        hoot.conf()["unify.enable.optimal.constrained.matches"] = "true"
+        #hoot.conf()["debug.maps.write"] = True
         hoot.conf()["tag.merger.default"] = "OverwriteTag2Merger"
 
         creator = hoot.PythonCreatorDescription()
