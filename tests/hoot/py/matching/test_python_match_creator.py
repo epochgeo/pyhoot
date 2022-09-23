@@ -20,7 +20,7 @@ class SimpleNameConflator:
 
     def extract_features(self, osm_map, elements1, elements2):
         df = hoot.DataFrame()
-        ignored = np.zeros(shape=(len(elements1),), dtype=np.bool)
+        ignored = np.zeros(shape=(len(elements1),), dtype=bool)
         return (df, ignored)
 
     def match_score(self, map, element1, element2, df):

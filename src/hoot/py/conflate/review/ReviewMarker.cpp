@@ -66,6 +66,9 @@ negative then the score is omitted.
           double score = -1,
           const std::vector<QString>& choices = std::vector<QString>()){
         self.mark(map, ids, note, reviewType, score, choices);
+        //PyErr_Print();
+        // TODO: remove me
+        PyErr_Clear();
       },
       py::arg("map"),
       py::arg("ids"),
