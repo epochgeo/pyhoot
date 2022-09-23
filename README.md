@@ -110,7 +110,6 @@ Then, install pyhoot and run the tests:
 source /opt/rh/devtoolset-8/enable
 export HOOT_HOME=/home/vagrant/pyhoot/build/
 export ICU_DATA=/home/vagrant/pyhoot/build/res
-PYTHON_CONFIGURE_OPTS="--enable-shared --with-pic" pyenv install --force 3.6.8
 cd pyhoot
 pip install -e .
 python -m hoot download-data

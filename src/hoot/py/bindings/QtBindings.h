@@ -49,10 +49,12 @@ namespace pybind11 {
                     temp = reinterpret_steal<object>(PyUnicode_AsUTF8String(load_src.ptr()));
                     if (!temp)
                     {
-                      LOG_WARN("Unable to encode str as UTF-8")
+                      // TODO: Downgrading the logging of these error messages until the errors can be fixed in 
+                      // the unit tests.
+                      LOG_DEBUG("Unable to encode str as UTF-8")
                       // UnicodeEncodeError
-                      PyErr_Print();
-                      PyErr_Clear();
+                      //PyErr_Print();
+                      //PyErr_Clear();
                       return false;
                     }
                     load_src = temp;
@@ -62,10 +64,10 @@ namespace pybind11 {
                 int err = PYBIND11_BYTES_AS_STRING_AND_SIZE(load_src.ptr(), &buffer, &length);
                 if (err == -1)
                 {
-                  LOG_WARN("Type error converting string")
+                  LOG_DEBUG("Type error converting string")
                   // TypeError
-                  PyErr_Print();
-                  PyErr_Clear();
+                  //PyErr_Print();
+                  //PyErr_Clear();
                   return false;
                 }
                 value = QString::fromUtf8(buffer, (int)length);

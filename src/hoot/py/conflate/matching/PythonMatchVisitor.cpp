@@ -70,7 +70,7 @@ PythonMatchVisitor::PythonMatchVisitor(const ConstOsmMapPtr& map,
   LOG_TRACE("PythonMatchVisitor");
 
   // TODO remove me, see PythonCreatorDescription::setMatchFromCriterion
-  LOG_WARN("Unknown2 is being ignored during match making. Please fix.")
+  LOG_DEBUG("Unknown2 is being ignored during match making. Please fix.")
   if (!MapProjector::isPlanar(map))
   {
     throw HootException("map must be in a planar projection.");
@@ -299,6 +299,7 @@ shared_ptr<HilbertRTree>& PythonMatchVisitor::getIndex()
       case CreatorDescription::BaseFeatureType::Point:
         LOG_DEBUG("visit nodes");
         osmMap->visitNodesRo(v);
+        _totalElementsToProcess = osmMap->getNodeCount();
         break;
       case CreatorDescription::BaseFeatureType::Highway:
       case CreatorDescription::BaseFeatureType::Building:
@@ -312,20 +313,25 @@ shared_ptr<HilbertRTree>& PythonMatchVisitor::getIndex()
         LOG_DEBUG("visit lines");
         osmMap->visitWaysRo(v);
         osmMap->visitRelationsRo(v);
+        _totalElementsToProcess = osmMap->getWayCount();
         break;
       case CreatorDescription::BaseFeatureType::Relation:
         LOG_DEBUG("visit relations");
         osmMap->visitRelationsRo(v);
+        _totalElementsToProcess = osmMap->getRelationCount();
         break;
       case CreatorDescription::BaseFeatureType::Unknown:
         LOG_DEBUG("visit all");
         osmMap->visitRo(v);
+        _totalElementsToProcess = osmMap->size();
         break;
       default:
+        // TODO: Downgrading log message until issues can be fixed in the unit tests.
         // visit all geometry types if the script didn't identify its geometry
-        LOG_INFO("Unrecognized geometry type, scanning all elements.");
-        LOG_INFO(" Please call PythonCreatorDescription.description.set_geometry_type")
+        LOG_DEBUG("Unrecognized geometry type, scanning all elements.");
+        LOG_DEBUG(" Please call PythonCreatorDescription.description.set_geometry_type")
         osmMap->visitRo(v);
+        _totalElementsToProcess = osmMap->size();
         break;
     }
     v.finalizeIndex();

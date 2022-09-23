@@ -8,7 +8,6 @@ import unittest
 
 import hoot
 
-
 def visit_me(element):
     tags = element.get_tags()
     tags["foo"] = "bar"
@@ -20,6 +19,10 @@ class TestElementOsmMapVisitor(unittest.TestCase):
         """
         test_basic tests to make sure a custom visitor can visit.
         """
+
+        hoot.Log.get_instance().set_level(hoot.Log.WARN)
+        hoot.warn("TestElementOsmMapVisitor")
+
         hoot.OsmMap.reset_counters()
         osm_map = hoot.OsmMap()
 
