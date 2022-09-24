@@ -51,7 +51,7 @@ namespace pybind11 {
                     {
                       // TODO: Downgrading the logging of these error messages until the errors can be fixed in 
                       // the unit tests.
-                      LOG_DEBUG("Unable to encode str as UTF-8")
+                      LOG_TRACE("Unable to encode str as UTF-8")
                       // UnicodeEncodeError
                       //PyErr_Print();
                       //PyErr_Clear();
@@ -64,7 +64,7 @@ namespace pybind11 {
                 int err = PYBIND11_BYTES_AS_STRING_AND_SIZE(load_src.ptr(), &buffer, &length);
                 if (err == -1)
                 {
-                  LOG_DEBUG("Type error converting string")
+                  LOG_TRACE("Type error converting string")
                   // TypeError
                   //PyErr_Print();
                   //PyErr_Clear();
