@@ -31,7 +31,7 @@ list(APPEND CONAN_LIBS libicui18n.a libicuuc.a)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
-find_package(Python3 3.6 EXACT COMPONENTS Development)
+find_package(Python3 3.6...<3.8 COMPONENTS Development)
 
 list(REMOVE_ITEM CONAN_LIBS
     wayland-server wayland-cursor wayland-egl wayland-client 

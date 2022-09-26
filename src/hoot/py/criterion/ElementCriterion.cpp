@@ -16,6 +16,7 @@
 #include <hoot/core/criterion/PoiCriterion.h>
 #include <hoot/core/criterion/PointCriterion.h>
 #include <hoot/core/criterion/PolygonCriterion.h>
+#include <hoot/core/criterion/StatusCriterion.h>
 #include <hoot/core/criterion/TagCriterion.h>
 #include <hoot/core/criterion/TagKeyCriterion.h>
 #include <hoot/core/criterion/WayNodeCriterion.h>
@@ -69,6 +70,11 @@ Returns:
   registerSubclass<PoiCriterion>(m, wrapme);
   registerSubclass<PointCriterion>(m, wrapme);
   registerSubclass<PolygonCriterion>(m, wrapme);
+  auto statusCrit = registerSubclass<StatusCriterion>(m, wrapme);
+  statusCrit.def(py::init([](Status status)
+  {
+    return make_shared<StatusCriterion>(status);
+  }));
   auto tagCrit = registerSubclass<TagCriterion>(m, wrapme);
   tagCrit.def(py::init([](QString key, QString value)
   {

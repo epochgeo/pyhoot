@@ -17,6 +17,8 @@ clean:
 	rm -rf $(FINAL_WHEEL)
 	rm -rf build
 	rm -f .quick .installquick .install
+	rm -f conanbuildinfo*
+	rm -f conan.lock
 	$(MAKE) -C sphinx clean
 
 build_wheel: $(FINAL_WHEEL)
@@ -24,7 +26,7 @@ build_wheel: $(FINAL_WHEEL)
 # Run pyhoot unit tests on a local build of pyhoot.
 test: local build/conf/dictionary/words.sqlite
 	HOOT_HOME=`pwd`/build PYTHONPATH=`pwd`/build/lib/:`pwd`/src/ \
-		python -m unittest discover -s tests.hoot
+	python -W ignore -m unittest discover -s tests/hoot/py
 
 docs: docs/PyHootManual.pdf
 
@@ -61,7 +63,7 @@ install: ._install
 
 testfinal: ._install
 	python -m hoot conflate tmp/ToyTestA.osm tmp/ToyTestA.osm tmp/ToyTestOut.osm
-	python -m unittest discover -s tests.hoot
+	python -W ignore -m unittest discover -s tests/hoot/py
 
 $(FINAL_WHEEL): dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
     # For some reason it can't find libjvm w/o LD_LIBRARY_PATH being specified.

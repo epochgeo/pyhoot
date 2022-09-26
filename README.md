@@ -40,7 +40,7 @@ Known Issues:
 
 ## Installation
 
-At this time, pyhoot is only available for Python 3.6.
+At this time, pyhoot is available for Python 3.6 and 3.7.
 
 Installing on CentOS 7:
 
@@ -103,15 +103,4 @@ python -m hoot help
 
 ## Development Environment
 
-Follow the [Hootenanny Conan install instructions](https://github.com/epochgeo/hootenanny-conan#install).
-
-Then, install pyhoot and run the tests:
-```
-source /opt/rh/devtoolset-8/enable
-export HOOT_HOME=/home/vagrant/pyhoot/build/
-PYTHON_CONFIGURE_OPTS="--enable-shared --with-pic" pyenv install --force 3.6.8
-cd pyhoot
-pip install -e .
-python -m hoot download-data
-make -j$(nproc) test
-```
+https://github.com/epochgeo/pyhoot/blob/main/docs/600-developer-docs.md

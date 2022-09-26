@@ -70,7 +70,7 @@ PythonMatchVisitor::PythonMatchVisitor(const ConstOsmMapPtr& map,
   LOG_TRACE("PythonMatchVisitor");
 
   // TODO remove me, see PythonCreatorDescription::setMatchFromCriterion
-  LOG_WARN("Unknown2 is being ignored during match making. Please fix.")
+  LOG_TRACE("Unknown2 is being ignored during match making. Please fix.")
   if (!MapProjector::isPlanar(map))
   {
     throw HootException("map must be in a planar projection.");
@@ -95,62 +95,68 @@ PythonMatchVisitor::PythonMatchVisitor(const ConstOsmMapPtr& map,
 
 void PythonMatchVisitor::_flushBuffer()
 {
-  LOG_DEBUG("_flushBuffer()...");
+  LOG_TRACE("_flushBuffer()...");
   ConstOsmMapPtr map = getMap();
 
   pair<DataFramePtr, vector<bool> > res = _pyInfo->getExtractFeatures()(map, _buffer1, _buffer2);
   DataFramePtr df = res.first;
   vector<bool> ignored = res.second;
 
-  pair< py::array_t<double, 3>, vector<QString> > result = _pyInfo->getMatchScore()(map,
-    _buffer1, _buffer2, df);
-  py::array_t<double, 3>& scores = result.first;
-  vector<QString>& reasons = result.second;
-  assert(_buffer1.size() == reasons.size());
-  assert(_buffer1.size() == scores.size() / 3);
-  PointCriterion pointC(map);
-  LinearCriterion linearC;
-  AreaCriterion areaC(map);
-
-  for (size_t i = 0; i < _buffer1.size(); i++)
+  LOG_VART(_buffer1.size());
+  LOG_VART(_buffer2.size());
+  if (!_buffer1.empty() && !_buffer2.empty())
   {
-    //_p = get<0>(result);
-    //_explainText = get<1>(result);
-    // skip all the hard ignores
-    if (ignored[i]) continue;
+    pair< py::array_t<double, 3>, vector<QString> > result = _pyInfo->getMatchScore()(map,
+      _buffer1, _buffer2, df);
+    py::array_t<double, 3>& scores = result.first;
+    vector<QString>& reasons = result.second;
+    assert(_buffer1.size() == reasons.size());
+    assert(_buffer1.size() == scores.size() / 3);
+    PointCriterion pointC(map);
+    LinearCriterion linearC;
+    AreaCriterion areaC(map);
 
-    MatchClassificationPtr matchClassification = make_shared<MatchClassification>(scores.at(i, 0),
-      scores.at(i, 1), scores.at(i, 2));
-
-    ConstElementPtr e1 = _buffer1[i];
-    ConstElementPtr e2 = _buffer2[i];
-
-    // Score each candidate and push it on the result vector.
-    shared_ptr<PythonMatch> m = make_shared<PythonMatch>(_pyInfo, map, e1->getElementId(),
-      e2->getElementId(), matchClassification, _mt);
-    m->setExplanation(reasons[i]);
-    m->setExtractedData(df, i);
-    MatchMembers mm;
-
-    // if we're confident this is not a miss
-    if (m->getType() != MatchType::Miss)
+    for (size_t i = 0; i < _buffer1.size(); i++)
     {
-      MatchMembers mm;
-      // derive the match members. This differs from the JavaScript interface.
-      if (pointC.isSatisfied(e1)) mm = mm | MatchMembers::Poi;
-      if (linearC.isSatisfied(e1)) mm = mm | MatchMembers::Polyline;
-      if (areaC.isSatisfied(e1)) mm = mm | MatchMembers::Polygon;
-      if (pointC.isSatisfied(e2)) mm = mm | MatchMembers::Poi;
-      if (linearC.isSatisfied(e2)) mm = mm | MatchMembers::Polyline;
-      if (areaC.isSatisfied(e2)) mm = mm | MatchMembers::Polygon;
+      //_p = get<0>(result);
+      //_explainText = get<1>(result);
+      // skip all the hard ignores
+      if (ignored[i]) continue;
 
-      m->setMatchMembers(mm);
-      _result->push_back(m);
+      MatchClassificationPtr matchClassification = make_shared<MatchClassification>(scores.at(i, 0),
+        scores.at(i, 1), scores.at(i, 2));
+
+      ConstElementPtr e1 = _buffer1[i];
+      ConstElementPtr e2 = _buffer2[i];
+
+      // Score each candidate and push it on the result vector.
+      shared_ptr<PythonMatch> m = make_shared<PythonMatch>(_pyInfo, map, e1->getElementId(),
+        e2->getElementId(), matchClassification, _mt);
+      m->setExplanation(reasons[i]);
+      m->setExtractedData(df, i);
+      MatchMembers mm;
+
+      // if we're confident this is not a miss
+      if (m->getType() != MatchType::Miss)
+      {
+        MatchMembers mm;
+        // derive the match members. This differs from the JavaScript interface.
+        if (pointC.isSatisfied(e1)) mm = mm | MatchMembers::Poi;
+        if (linearC.isSatisfied(e1)) mm = mm | MatchMembers::Polyline;
+        if (areaC.isSatisfied(e1)) mm = mm | MatchMembers::Polygon;
+        if (pointC.isSatisfied(e2)) mm = mm | MatchMembers::Poi;
+        if (linearC.isSatisfied(e2)) mm = mm | MatchMembers::Polyline;
+        if (areaC.isSatisfied(e2)) mm = mm | MatchMembers::Polygon;
+
+        m->setMatchMembers(mm);
+        _result->push_back(m);
+      }
     }
   }
+  
   _buffer1.clear();
   _buffer2.clear();
-  LOG_DEBUG("..._flushBuffer()");
+  LOG_TRACE("..._flushBuffer()");
 }
 
 QString PythonMatchVisitor::getDescription() const { return ""; }
@@ -196,12 +202,10 @@ void PythonMatchVisitor::checkForMatch(const ConstElementPtr& e)
     if (eid == from) continue;
 
     ConstElementPtr e2 = map->getElement(eid);
-    LOG_VARD(e->getTags().getName());
-    LOG_VARD(e->getElementId());
-    LOG_VARD(e2->getTags().getName());
-    LOG_VARD(e2->getElementId());
-
-
+    LOG_VART(e->getTags().getName());
+    LOG_VART(e->getElementId());
+    LOG_VART(e2->getTags().getName());
+    LOG_VART(e2->getElementId());
 
     // isCorrectOrder and isMatchCandidate don't apply to Point/Polygon, so we add a different
     // workflow for it here. All other generic scripts use isMatchCandidate to identify both
@@ -209,12 +213,12 @@ void PythonMatchVisitor::checkForMatch(const ConstElementPtr& e)
     // different geometries. See related note in getIndex about Point/Polygon.
 
     bool attemptToMatch = false;
-    LOG_VARD(isCorrectOrder(e, e2));
-    LOG_VARD(isMatchCandidate(e2));
+    LOG_VART(isCorrectOrder(e, e2));
+    LOG_VART(isMatchCandidate(e2));
     // TODO fix me, see PythonCreatorDescription::setMatchFromCriterion
     attemptToMatch = (e2->getStatus() == Status::Unknown1 || isCorrectOrder(e, e2)) &&
       isMatchCandidate(e2);
-    LOG_VARD(attemptToMatch);
+    LOG_VART(attemptToMatch);
 
     if (attemptToMatch)
     {
@@ -299,6 +303,7 @@ shared_ptr<HilbertRTree>& PythonMatchVisitor::getIndex()
       case CreatorDescription::BaseFeatureType::Point:
         LOG_DEBUG("visit nodes");
         osmMap->visitNodesRo(v);
+        _totalElementsToProcess = osmMap->getNodeCount();
         break;
       case CreatorDescription::BaseFeatureType::Highway:
       case CreatorDescription::BaseFeatureType::Building:
@@ -312,20 +317,25 @@ shared_ptr<HilbertRTree>& PythonMatchVisitor::getIndex()
         LOG_DEBUG("visit lines");
         osmMap->visitWaysRo(v);
         osmMap->visitRelationsRo(v);
+        _totalElementsToProcess = osmMap->getWayCount();
         break;
       case CreatorDescription::BaseFeatureType::Relation:
         LOG_DEBUG("visit relations");
         osmMap->visitRelationsRo(v);
+        _totalElementsToProcess = osmMap->getRelationCount();
         break;
       case CreatorDescription::BaseFeatureType::Unknown:
         LOG_DEBUG("visit all");
         osmMap->visitRo(v);
+        _totalElementsToProcess = osmMap->size();
         break;
       default:
+        // TODO: Downgrading log message until issues can be fixed in the unit tests.
         // visit all geometry types if the script didn't identify its geometry
-        LOG_INFO("Unrecognized geometry type, scanning all elements.");
-        LOG_INFO(" Please call PythonCreatorDescription.description.set_geometry_type")
+        LOG_DEBUG("Unrecognized geometry type, scanning all elements.");
+        LOG_DEBUG(" Please call PythonCreatorDescription.description.set_geometry_type")
         osmMap->visitRo(v);
+        _totalElementsToProcess = osmMap->size();
         break;
     }
     v.finalizeIndex();
@@ -390,9 +400,9 @@ bool PythonMatchVisitor::isMatchCandidate(ConstElementPtr e)
       _matchCandidateCache[e->getElementId()] = result;
     }
   }
-  LOG_VARD(e->getTags().getName());
-  LOG_VARD(e->getElementId());
-  LOG_VARD(result);
+  LOG_VART(e->getTags().getName());
+  LOG_VART(e->getElementId());
+  LOG_VART(result);
 
   return result;
 }
