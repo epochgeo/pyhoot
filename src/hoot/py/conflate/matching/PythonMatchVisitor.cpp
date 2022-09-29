@@ -63,6 +63,7 @@ PythonMatchVisitor::PythonMatchVisitor(const ConstOsmMapPtr& map,
   _elementsEvaluated(0),
   _numElementsVisited(0),
   _numMatchCandidatesVisited(0),
+  _mapSize(map->size()),
   _taskStatusUpdateInterval(ConfigOptions().getTaskStatusUpdateInterval()),
   _memoryCheckUpdateInterval(ConfigOptions().getMemoryUsageCheckerInterval()),
   _totalElementsToProcess(0)
@@ -416,13 +417,21 @@ void PythonMatchVisitor::visit(const ConstElementPtr& e)
 
     _numMatchCandidatesVisited++;
     //if (_numMatchCandidatesVisited % (_taskStatusUpdateInterval * 100) == 0)
-    if (_numMatchCandidatesVisited % 128 == 0)
+    if (_numMatchCandidatesVisited % 100 == 0)
     {
       PROGRESS_STATUS(
         "\tProcessed " << StringUtils::formatLargeNumber(_numMatchCandidatesVisited) <<
         " match candidates / " << StringUtils::formatLargeNumber(_totalElementsToProcess) <<
         " total elements.");
     }
+  }
+
+  _numElementsVisited++;
+  if (_numElementsVisited % 1000 == 0)
+  {
+    PROGRESS_STATUS(
+      "\tProcessed " << StringUtils::formatLargeNumber(_numElementsVisited) << " of " <<
+      StringUtils::formatLargeNumber(_mapSize) << " elements.");
   }
 }
 

@@ -156,6 +156,7 @@ private:
   int _elementsEvaluated;
   long _numElementsVisited;
   long _numMatchCandidatesVisited;
+  long _mapSize;
 
   int _taskStatusUpdateInterval;
   int _memoryCheckUpdateInterval;
