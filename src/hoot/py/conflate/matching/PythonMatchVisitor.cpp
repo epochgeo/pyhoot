@@ -315,18 +315,15 @@ shared_ptr<HilbertRTree>& PythonMatchVisitor::getIndex()
       case CreatorDescription::BaseFeatureType::Railway:
       case CreatorDescription::BaseFeatureType::PowerLine:
       case CreatorDescription::BaseFeatureType::Line:
-        LOG_DEBUG("visit lines");
         osmMap->visitWaysRo(v);
         osmMap->visitRelationsRo(v);
         _totalElementsToProcess = osmMap->getWayCount();
         break;
       case CreatorDescription::BaseFeatureType::Relation:
-        LOG_DEBUG("visit relations");
         osmMap->visitRelationsRo(v);
         _totalElementsToProcess = osmMap->getRelationCount();
         break;
       case CreatorDescription::BaseFeatureType::Unknown:
-        LOG_DEBUG("visit all");
         osmMap->visitRo(v);
         _totalElementsToProcess = osmMap->size();
         break;
