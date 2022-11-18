@@ -16,12 +16,6 @@ from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 from setuptools.command.test import test as TestCommand
 
-#print(__file__)
-#print(Path(__file__).parent.resolve())
-# TODO: fix
-#PYHOOT_VERSION = open(os.path.join(Path(__file__).parent.resolve(), "VERSION")).read()
-PYHOOT_VERSION = "0.2.64.4"
-
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
         Extension.__init__(self, name, sources=["libcode.version"])
@@ -160,7 +154,7 @@ class CMakeBuild(build_ext):
         copymode(src_file, dest_file)
 
 setup(name = 'hoot',
-        version = PYHOOT_VERSION,
+        version = "0.2.64.4",
         description = 'This is an unofficial wrapper of Hootenanny',
         long_description = open("README.md").read(),
         long_description_content_type = "text/markdown",
