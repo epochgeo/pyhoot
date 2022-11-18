@@ -48,7 +48,7 @@ quick: ._quick
 	python -m pip install --force dist/hoot-$(VERSION)-cp37-cp37m-linux_x86_64.whl
 	touch .quick
 
-# build and install a "quick" wheel. This uses references to local libraries
+# build and install a "quick" wheel. This uses references to local libraries.
 installquick: ._installquick
 ._installquick: ._quick
 	python -m pip install --force dist/hoot-$(VERSION)-cp37-cp37m-linux_x86_64.whl
@@ -60,8 +60,9 @@ install: ._install
 	python -m pip install --force $(FINAL_WHEEL)
 	touch .install
 
+# TODO: HOOT_HOME must be set to manually to "~/.pyenv/versions/3.7.14/lib/python3.7/site-packages/hoot" for this to work
 testfinal: ._install
-	python -m hoot conflate tmp/ToyTestA.osm tmp/ToyTestA.osm tmp/ToyTestOut.osm
+	python -m hoot conflate $(HOOT_HOME)/ToyTestA.osm $(HOOT_HOME)/ToyTestA.osm ToyTestOut.osm
 	python -W ignore -m unittest discover -s tests/hoot/py
 
 $(FINAL_WHEEL): dist/hoot-$(VERSION)-cp37-cp37m-linux_x86_64.whl

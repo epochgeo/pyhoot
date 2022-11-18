@@ -17,10 +17,9 @@ import zipfile
 
 import hoot
 
-import tdp
-
 if __name__ == "__main__":
-    if len(sys.argv) > 3 and sys.argv[1] == "env":
+    #print(sys.argv)
+    if len(sys.argv) == 3 and sys.argv[1] == "env":
         if sys.argv[2] == "home":
             print(hoot.HOOT_HOME)
             sys.exit(0)
@@ -60,22 +59,15 @@ if __name__ == "__main__":
                 join(os.environ["PROJ_LIB"], "proj.db"))
     
         sys.exit(0)
-    
-    # TODO
-    # look for proj.db & icudt69l.dat. If they don't exist, prompt them to
-    # download it.
-    # https://github.com/unicode-org/icu/releases/download/release-69-1/icu4c-69_1-data-bin-l.zip
-    # https://hoot-support.s3.amazonaws.com/words1.sqlite.bz2
-    
-    # Call the hoot command line directly.
-    #BINARY_PATH = str(os.path.join(hoot.HOOT_HOME, "bin/hoot"))
-    #sys.exit(subprocess.run([BINARY_PATH] + sys.argv[1:], check=True).
-    #         returncode)
-
-    cmd = ""
-    if len(sys.argv) >= 2:
-        cmd = sys.argv[1]
-    args = []
-    if len(sys.argv) >= 3:
-        args = sys.argv[2:]
-    hoot.Command.run(cmd, args)
+    else:
+        # Call the hoot command line directly.
+        #BINARY_PATH = str(os.path.join(hoot.HOOT_HOME, "bin/hoot"))
+        #sys.exit(subprocess.run([BINARY_PATH] + sys.argv[1:], check=True).
+        #         returncode)
+        cmd = ""
+        if len(sys.argv) >= 2:
+            cmd = sys.argv[1]
+        args = []
+        if len(sys.argv) >= 3:
+            args = sys.argv[2:]
+        hoot.Command.run(cmd, args)

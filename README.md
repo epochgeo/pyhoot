@@ -99,6 +99,7 @@ The Hootenanny CLI is conveniently wrapped in a python call:
 
 ```
 python -m hoot help
+python -m hoot conflate $HOOT_HOME/ToyTestA.osm $HOOT_HOME/ToyTestB.osm out.osm
 ```
 
 ## Development Environment

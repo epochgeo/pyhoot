@@ -188,7 +188,7 @@ Unofficial hootenanny python bindings
 
 
 ### _class_ hoot.libpyhoot.AreaCriterion()
-Bases: `hoot.libpyhoot.ElementCriterion`
+Bases: `ElementCriterion`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -248,7 +248,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.ChainCriterion()
-Bases: `hoot.libpyhoot.ElementCriterion`
+Bases: `ElementCriterion`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -340,7 +340,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.CircularErrorExtractor()
-Bases: `hoot.libpyhoot.FeatureExtractor`
+Bases: `FeatureExtractor`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -401,7 +401,7 @@ toString(self: hoot.libpyhoot.FeatureExtractor) -> QString
 
 
 ### _class_ hoot.libpyhoot.Command()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -418,7 +418,7 @@ Example:
 
 
 ### _class_ hoot.libpyhoot.ConflateCaseTestSuite()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -426,7 +426,7 @@ Bases: `pybind11_builtins.pybind11_object`
 #### _static_ run_dir(arg0: QString)
 
 ### _class_ hoot.libpyhoot.ConflateExecutor()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.ConflateExecutor)
@@ -508,7 +508,7 @@ setOutputStatsFile(self: hoot.libpyhoot.ConflateExecutor, arg0: QString) -> None
 
 
 ### _class_ hoot.libpyhoot.ConstOsmMapOperation()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -516,7 +516,7 @@ Bases: `pybind11_builtins.pybind11_object`
 #### apply(self: hoot.libpyhoot.ConstOsmMapOperation, arg0: hoot.libpyhoot.OsmMap)
 
 ### _class_ hoot.libpyhoot.CreatorDescription()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### AREA(_ = <BaseFeatureType.AREA: 6_ )
@@ -524,7 +524,7 @@ Bases: `pybind11_builtins.pybind11_object`
 #### BUILDING(_ = <BaseFeatureType.BUILDING: 2_ )
 
 #### _class_ BaseFeatureType()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 This is how we map various match creators to the feature they operate on.
 Helpful when generating stats later.
@@ -597,7 +597,7 @@ Members:
 #### CALCTYPENONE(_ = <FeatureCalcType.CALCTYPENONE: 0_ )
 
 #### _class_ FeatureCalcType()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 Members:
 
@@ -827,7 +827,7 @@ toString(self: hoot.libpyhoot.CreatorDescription) -> QString
 
 
 ### _class_ hoot.libpyhoot.DataFrame()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.DataFrame)
@@ -1460,7 +1460,7 @@ same then the factor is deactivated.
 
 
 ### _class_ hoot.libpyhoot.DataSamples()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -1480,7 +1480,7 @@ toDataFrame(self: hoot.libpyhoot.DataSamples, arg0: float) -> Tgs::DataFrame
 
 
 ### _class_ hoot.libpyhoot.Element()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -1760,7 +1760,7 @@ toString(self: hoot.libpyhoot.Element) -> QString
 
 
 ### _class_ hoot.libpyhoot.ElementCriterion()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -1806,7 +1806,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.ElementId()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -1838,7 +1838,7 @@ toString(self: hoot.libpyhoot.ElementId) -> QString
 
 
 ### _class_ hoot.libpyhoot.ElementOsmMapVisitorPy()
-Bases: `hoot.libpyhoot.ElementVisitor`
+Bases: `ElementVisitor`
 
 
 #### \__init__(self: hoot.libpyhoot.ElementOsmMapVisitorPy)
@@ -1848,14 +1848,70 @@ function is the user defined function that will be called for all elements. Elem
 modified directly by the user function.
 
 
+### _class_ hoot.libpyhoot.ElementType()
+Bases: `pybind11_object`
+
+
+#### NODE(_ = <Type.NODE: 0_ )
+
+#### RELATION(_ = <Type.RELATION: 2_ )
+
+#### _class_ Type()
+Bases: `pybind11_object`
+
+Members:
+
+NODE
+
+WAY
+
+RELATION
+
+UNKNOWN
+
+
+#### NODE(_ = <Type.NODE: 0_ )
+
+#### RELATION(_ = <Type.RELATION: 2_ )
+
+#### UNKNOWN(_ = <Type.UNKNOWN: 3_ )
+
+#### WAY(_ = <Type.WAY: 1_ )
+
+#### \__init__(self: hoot.libpyhoot.ElementType.Type, value: int)
+
+#### _property_ name()
+
+#### _property_ value()
+
+#### UNKNOWN(_ = <Type.UNKNOWN: 3_ )
+
+#### WAY(_ = <Type.WAY: 1_ )
+
+#### \__init__(\*args, \*\*kwargs)
+Overloaded function.
+
+
+1. __init__(self: hoot.libpyhoot.ElementType) -> None
+
+
+2. __init__(self: hoot.libpyhoot.ElementType, arg0: hoot::ElementType::Type) -> None
+
+
+#### _static_ fromString(arg0: QString)
+
+#### getEnum(self: hoot.libpyhoot.ElementType)
+
+#### _static_ isValidTypeString(arg0: QString)
+
 ### _class_ hoot.libpyhoot.ElementVisitor()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
 
 ### _class_ hoot.libpyhoot.EuclideanDistanceExtractor()
-Bases: `hoot.libpyhoot.FeatureExtractor`
+Bases: `FeatureExtractor`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -1953,7 +2009,7 @@ toString(self: hoot.libpyhoot.FeatureExtractor) -> QString
 
 
 ### _class_ hoot.libpyhoot.ExactStringDistance()
-Bases: `hoot.libpyhoot.StringDistance`
+Bases: `StringDistance`
 
 
 #### \__init__(self: hoot.libpyhoot.ExactStringDistance)
@@ -1964,7 +2020,7 @@ distance between two strings.
 
 
 ### _class_ hoot.libpyhoot.Factory()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.Factory)
@@ -1978,7 +2034,7 @@ returns all registered classes that implement the given base class
 
 
 ### _class_ hoot.libpyhoot.FeatureExtractor()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -2031,7 +2087,7 @@ toString(self: hoot.libpyhoot.FeatureExtractor) -> QString
 
 
 ### _class_ hoot.libpyhoot.HasNameCriterion()
-Bases: `hoot.libpyhoot.ElementCriterion`
+Bases: `ElementCriterion`
 
 
 #### \__init__(self: hoot.libpyhoot.HasNameCriterion)
@@ -2077,7 +2133,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.IoUtils()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -2477,7 +2533,7 @@ Determines if an input string is a URL by the hoot definition
 #### loadMaps(_ = Non_ )
 
 #### _static_ load_map()
-loadMap(map: hoot.libpyhoot.OsmMap, path: QString, useFileId: bool = True, defaultStatus: hoot.libpyhoot.Status = <hoot.libpyhoot.Status object at 0x7fe32753b650>, translationScript: QString = ‘’, ogrFeatureLimit: int = -1, jobSource: QString = ‘’, numTasks: int = -1) -> None
+loadMap(map: hoot.libpyhoot.OsmMap, path: QString, useFileId: bool = True, defaultStatus: hoot.libpyhoot.Status = <hoot.libpyhoot.Status object at 0x7f76a1f25c70>, translationScript: QString = ‘’, ogrFeatureLimit: int = -1, jobSource: QString = ‘’, numTasks: int = -1) -> None
 
 Loads an OSM map into an OsmMap object
 
@@ -2640,7 +2696,7 @@ Writes an output directory
 
 
 ### _class_ hoot.libpyhoot.KskipBigramDistance()
-Bases: `hoot.libpyhoot.StringDistance`
+Bases: `StringDistance`
 
 
 #### \__init__(self: hoot.libpyhoot.KskipBigramDistance)
@@ -2651,7 +2707,7 @@ distance between two strings.
 
 
 ### _class_ hoot.libpyhoot.LevenshteinDistance()
-Bases: `hoot.libpyhoot.StringDistance`
+Bases: `StringDistance`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -2684,7 +2740,7 @@ Set the configuration for this object.
 
 
 ### _class_ hoot.libpyhoot.LinearCriterion()
-Bases: `hoot.libpyhoot.ElementCriterion`
+Bases: `ElementCriterion`
 
 
 #### \__init__(self: hoot.libpyhoot.LinearCriterion)
@@ -2730,7 +2786,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.Log()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### DEBUG(_ = <WarningLevel.DEBUG: 1000_ )
@@ -2750,7 +2806,7 @@ Bases: `pybind11_builtins.pybind11_object`
 #### WARN(_ = <WarningLevel.WARN: 3000_ )
 
 #### _class_ WarningLevel()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 Members:
 
@@ -2870,7 +2926,7 @@ setLevel(self: hoot.libpyhoot.Log, arg0: hoot::Log::WarningLevel) -> None
 
 
 ### _class_ hoot.libpyhoot.MapCleaner()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.MapCleaner)
@@ -2878,7 +2934,7 @@ Bases: `pybind11_builtins.pybind11_object`
 #### apply(self: hoot.libpyhoot.MapCleaner, arg0: hoot.libpyhoot.OsmMap)
 
 ### _class_ hoot.libpyhoot.MapComparator()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.MapComparator)
@@ -2913,7 +2969,7 @@ setUseDateTime(self: hoot.libpyhoot.MapComparator) -> None
 
 
 ### _class_ hoot.libpyhoot.MapProjector()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -2934,7 +2990,7 @@ projectToWgs84(arg0: hoot::OsmMap) -> None
 
 
 ### _class_ hoot.libpyhoot.MatchClassification()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -2975,13 +3031,13 @@ toString(self: hoot.libpyhoot.MatchClassification) -> QString
 
 
 ### _class_ hoot.libpyhoot.MatchCreator()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
 
 ### _class_ hoot.libpyhoot.MatchFeatureExtractor()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.MatchFeatureExtractor, arg0: bool)
@@ -3024,7 +3080,7 @@ Evaluates all the features in the given map.
 
 
 ### _class_ hoot.libpyhoot.MatchThreshold()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -3071,7 +3127,7 @@ toString(self: hoot.libpyhoot.MatchThreshold) -> QString
 
 
 ### _class_ hoot.libpyhoot.MaxWordSetDistance()
-Bases: `hoot.libpyhoot.StringDistance`
+Bases: `StringDistance`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -3123,7 +3179,7 @@ setStringDistance(self: hoot.libpyhoot.MaxWordSetDistance, arg0: hoot.libpyhoot.
 
 
 ### _class_ hoot.libpyhoot.MeanWordSetDistance()
-Bases: `hoot.libpyhoot.StringDistance`
+Bases: `StringDistance`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -3175,7 +3231,7 @@ setStringDistance(self: hoot.libpyhoot.MeanWordSetDistance, arg0: hoot.libpyhoot
 
 
 ### _class_ hoot.libpyhoot.MinSumWordSetDistance()
-Bases: `hoot.libpyhoot.StringDistance`
+Bases: `StringDistance`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -3227,7 +3283,7 @@ setStringDistance(self: hoot.libpyhoot.MinSumWordSetDistance, arg0: hoot.libpyho
 
 
 ### _class_ hoot.libpyhoot.NameExtractor()
-Bases: `hoot.libpyhoot.FeatureExtractor`
+Bases: `FeatureExtractor`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -3294,7 +3350,7 @@ toString(self: hoot.libpyhoot.FeatureExtractor) -> QString
 
 
 ### _class_ hoot.libpyhoot.NoInformationCriterion()
-Bases: `hoot.libpyhoot.ElementCriterion`
+Bases: `ElementCriterion`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -3362,7 +3418,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.NodeCriterion()
-Bases: `hoot.libpyhoot.ElementCriterion`
+Bases: `ElementCriterion`
 
 
 #### \__init__(self: hoot.libpyhoot.NodeCriterion)
@@ -3408,7 +3464,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.NotCriterion()
-Bases: `hoot.libpyhoot.ElementCriterion`
+Bases: `ElementCriterion`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -3503,7 +3559,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.OrCriterion()
-Bases: `hoot.libpyhoot.ChainCriterion`
+Bases: `ChainCriterion`
 
 
 #### \__init__(self: hoot.libpyhoot.OrCriterion, \*args)
@@ -3569,7 +3625,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.OsmJsonReader()
-Bases: `hoot.libpyhoot.OsmMapReader`
+Bases: `OsmMapReader`
 
 
 #### \__init__(self: hoot.libpyhoot.OsmJsonReader)
@@ -3751,7 +3807,7 @@ supportedFormats(self: hoot.libpyhoot.OsmJsonReader) -> QString
 
 
 ### _class_ hoot.libpyhoot.OsmJsonWriter()
-Bases: `hoot.libpyhoot.OsmMapWriter`
+Bases: `OsmMapWriter`
 
 
 #### \__init__(self: hoot.libpyhoot.OsmJsonWriter)
@@ -3833,7 +3889,7 @@ Very handy for testing.
 #### write(self: hoot.libpyhoot.OsmJsonWriter, arg0: hoot.libpyhoot.OsmMap)
 
 ### _class_ hoot.libpyhoot.OsmMap()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.OsmMap)
@@ -3858,7 +3914,7 @@ times.
 
 
 #### add_relation()
-addRelation(self: hoot.libpyhoot.OsmMap, arg0: hoot::Relation) -> None
+addRelation(self: hoot.libpyhoot.OsmMap, arg0: hoot.libpyhoot.Relation) -> None
 
 
 #### add_way()
@@ -4001,7 +4057,7 @@ Overloaded function.
 getElement returns an element by ElementId
 
 
-1. getElement(self: hoot.libpyhoot.OsmMap, arg0: hoot::ElementType, arg1: int) -> hoot.libpyhoot.Element
+1. getElement(self: hoot.libpyhoot.OsmMap, arg0: hoot.libpyhoot.ElementType, arg1: int) -> hoot.libpyhoot.Element
 
 getElement returns an element by element type and id
 
@@ -4230,8 +4286,6 @@ function throws an error.
 
 #### visitNodesRo(_ = Non_ )
 
-#### visitNodesRw(_ = Non_ )
-
 #### visitRelationsRo(_ = Non_ )
 
 #### visitRelationsRw(_ = Non_ )
@@ -4246,10 +4300,6 @@ function throws an error.
 
 #### visit_nodes_ro()
 visitNodesRo(self: hoot.libpyhoot.OsmMap, arg0: hoot::ConstElementVisitor) -> None
-
-
-#### visit_nodes_rw()
-visitNodesRw(self: hoot.libpyhoot.OsmMap, arg0: hoot::ElementVisitor) -> None
 
 
 #### visit_relations_ro()
@@ -4334,7 +4384,7 @@ visitWaysRw(self: hoot.libpyhoot.OsmMap, arg0: hoot::ElementVisitor) -> None
 
 
 ### _class_ hoot.libpyhoot.OsmMapReader()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -4430,7 +4480,7 @@ If multiple are supported, delimit them with a semicolon.
 
 
 ### _class_ hoot.libpyhoot.OsmMapWriter()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -4489,7 +4539,7 @@ and all data is guaranteed to be flushed.
 
 
 ### _class_ hoot.libpyhoot.OsmSchema()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.OsmSchema)
@@ -5078,7 +5128,7 @@ updateOrCreateVertex(self: hoot.libpyhoot.OsmSchema, arg0: hoot::SchemaVertex) -
 
 
 ### _class_ hoot.libpyhoot.OsmXmlWriter()
-Bases: `hoot.libpyhoot.OsmMapWriter`
+Bases: `OsmMapWriter`
 
 
 #### \__init__(self: hoot.libpyhoot.OsmXmlWriter)
@@ -5156,8 +5206,54 @@ memory limitations with real data.
 
 #### write(self: hoot.libpyhoot.OsmXmlWriter, arg0: hoot.libpyhoot.OsmMap)
 
+### _class_ hoot.libpyhoot.PoiCriterion()
+Bases: `ElementCriterion`
+
+
+#### \__init__(self: hoot.libpyhoot.PoiCriterion)
+
+#### clone(self: hoot.libpyhoot.ElementCriterion)
+
+#### isSatisfied(_ = Non_ )
+
+#### is_satisfied()
+isSatisfied(
+
+```
+*
+```
+
+args, 
+
+```
+**
+```
+
+kwargs)
+Overloaded function.
+
+
+1. isSatisfied(self: hoot.libpyhoot.ElementCriterion, arg0: hoot::Element) -> bool
+
+
+2. isSatisfied(self: hoot.libpyhoot.ElementCriterion, arg0: List[hoot::Element]) -> numpy.ndarray[bool]
+
+This override to the isSatisfied function is pyhoot specific and allows you to calculate
+satisfaction on an array of values in one pass.
+
+Returns:
+
+    a boolean numpy array
+
+
+#### toString(_ = Non_ )
+
+#### to_string()
+toString(self: hoot.libpyhoot.ElementCriterion) -> QString
+
+
 ### _class_ hoot.libpyhoot.PointCriterion()
-Bases: `hoot.libpyhoot.ElementCriterion`
+Bases: `ElementCriterion`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -5217,7 +5313,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.PolygonCriterion()
-Bases: `hoot.libpyhoot.ElementCriterion`
+Bases: `ElementCriterion`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -5277,7 +5373,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.PythonCreatorDescription()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.PythonCreatorDescription)
@@ -5398,7 +5494,7 @@ for example: towns and cities.
 
 
 ### _class_ hoot.libpyhoot.PythonMatchCreator()
-Bases: `hoot.libpyhoot.MatchCreator`
+Bases: `MatchCreator`
 
 
 #### \__init__(self: hoot.libpyhoot.PythonMatchCreator)
@@ -5440,7 +5536,7 @@ setName(self: hoot.libpyhoot.PythonMatchCreator, arg0: QString) -> None
 
 
 ### _class_ hoot.libpyhoot.PythonMergerCreator()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.PythonMergerCreator)
@@ -5460,7 +5556,7 @@ setArguments(self: hoot.libpyhoot.PythonMergerCreator, arg0: List[QString]) -> N
 
 
 ### _class_ hoot.libpyhoot.RandomForest()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.RandomForest)
@@ -5791,15 +5887,639 @@ Build the forest from a data set
 
 
 ### _class_ hoot.libpyhoot.RecursiveElementRemover()
-Bases: `hoot.libpyhoot.ConstOsmMapOperation`
+Bases: `ConstOsmMapOperation`
 
 
 #### \__init__(self: hoot.libpyhoot.RecursiveElementRemover, arg0: hoot.libpyhoot.ElementId)
 
 #### apply(self: hoot.libpyhoot.ConstOsmMapOperation, arg0: hoot.libpyhoot.OsmMap)
 
+### _class_ hoot.libpyhoot.Relation()
+Bases: `Element`
+
+
+#### \__init__(\*args, \*\*kwargs)
+
+#### addTags(_ = Non_ )
+
+#### add_tags()
+addTags(self: hoot.libpyhoot.Element, arg0: hoot::Tags) -> None
+
+
+#### className(_ = Non_ )
+
+#### _static_ class_name()
+className() -> QString
+
+
+#### clear(self: hoot.libpyhoot.Relation)
+Removes members, tags, type and circularError.
+
+
+#### clone(self: hoot.libpyhoot.Element)
+
+#### contains(self: hoot.libpyhoot.Relation, arg0: hoot::ElementId)
+Returns true if this relation contains the specified ElementId. This does not recursively
+search for the element.
+
+
+#### getAdjoiningMemberIds(_ = Non_ )
+
+#### getChangeset(_ = Non_ )
+
+#### getCircularError(_ = Non_ )
+
+#### getElementId(_ = Non_ )
+
+#### getElementType(_ = Non_ )
+
+#### getElementsByRole(_ = Non_ )
+
+#### getEnvelope(_ = Non_ )
+
+#### getEnvelopeInternal(_ = Non_ )
+
+#### getId(_ = Non_ )
+
+#### getMember(_ = Non_ )
+
+#### getMemberCount(_ = Non_ )
+
+#### getMemberIds(_ = Non_ )
+
+#### getMembers(_ = Non_ )
+
+#### getRawCircularError(_ = Non_ )
+
+#### getRole(_ = Non_ )
+
+#### getStatus(_ = Non_ )
+
+#### getStatusString(_ = Non_ )
+
+#### getTag(_ = Non_ )
+
+#### getTagCount(_ = Non_ )
+
+#### getTags(_ = Non_ )
+
+#### getTimestamp(_ = Non_ )
+
+#### getType(_ = Non_ )
+
+#### getUid(_ = Non_ )
+
+#### getUser(_ = Non_ )
+
+#### getVersion(_ = Non_ )
+
+#### getVisible(_ = Non_ )
+
+#### get_adjoining_member_ids()
+getAdjoiningMemberIds(self: hoot.libpyhoot.Relation, arg0: hoot::ElementId) -> QList<hoot::ElementId>
+
+Retrieves the member element IDs for members placed immediately before and after the member
+element with the specified ID
+
+
+* **Parameters**
+
+    **memberId** – the ID of the member element to retrieve adjoining member element IDs for
+
+
+
+* **Returns**
+
+    If a member with the specified ID exists 1) and is neither the first nor last member, a
+
+
+list with two elements IDs where the first ID is the ID of the member element directly
+preceding the element with the specified ID and the second ID is the ID of the member directly
+succeeding the element with the specified ID. 2) and is the first member, a list with one
+element ID where the ID is the ID of the member directly succeeding the element with the
+specified ID. 3) and is the last member, a list with one element ID where the ID is the ID of
+the member directly preceding the element with the specified ID. If the relation contains no
+member with the specified ID, then an empty list is returned.
+
+
+#### get_changeset()
+getChangeset(self: hoot.libpyhoot.Element) -> int
+
+
+#### get_circular_error()
+getCircularError(self: hoot.libpyhoot.Element) -> float
+
+Circular Error is in meters to 2 standard deviations. In other words it is about the 95%
+confidence interval assuming a normal distribution.
+
+
+#### get_element_id()
+getElementId(self: hoot.libpyhoot.Element) -> hoot::ElementId
+
+
+#### get_element_type()
+getElementType(self: hoot.libpyhoot.Relation) -> hoot::ElementType
+
+
+#### get_elements_by_role()
+getElementsByRole(self: hoot.libpyhoot.Relation, arg0: QString) -> List[hoot::RelationData::Entry]
+
+Retrieves all members with a particular role
+
+
+* **Parameters**
+
+    **role** – role to search for
+
+
+
+* **Returns**
+
+    a collection of members
+
+
+
+#### get_envelope()
+getEnvelope(self: hoot.libpyhoot.Relation, arg0: hoot::ElementProvider) -> geos::geom::Envelope
+
+
+#### get_envelope_internal()
+getEnvelopeInternal(self: hoot.libpyhoot.Relation, arg0: hoot::ElementProvider) -> geos::geom::Envelope
+
+
+#### get_id()
+getId(self: hoot.libpyhoot.Element) -> int
+
+
+#### get_member()
+getMember(self: hoot.libpyhoot.Relation, arg0: hoot::ElementId) -> hoot::RelationData::Entry
+
+
+#### get_member_count()
+getMemberCount(self: hoot.libpyhoot.Relation) -> int
+
+
+#### get_member_ids()
+getMemberIds(
+
+```
+*
+```
+
+args, 
+
+```
+**
+```
+
+kwargs)
+Overloaded function.
+
+
+1. getMemberIds(self: hoot.libpyhoot.Relation) -> Set[hoot::ElementId]
+
+
+2. getMemberIds(self: hoot.libpyhoot.Relation, arg0: hoot::ElementType) -> Set[hoot::ElementId]
+
+Returns the IDs of members
+
+
+* **Parameters**
+
+    **elementType** – optional element type of element Ids to return
+
+
+
+* **Returns**
+
+    a collection of element IDs
+
+
+
+#### get_members()
+getMembers(
+
+```
+*
+```
+
+args, 
+
+```
+**
+```
+
+kwargs)
+Overloaded function.
+
+
+1. getMembers(self: hoot.libpyhoot.Relation) -> List[hoot::RelationData::Entry]
+
+
+2. getMembers(self: hoot.libpyhoot.Relation) -> List[hoot::RelationData::Entry]
+
+
+#### get_raw_circular_error()
+getRawCircularError(self: hoot.libpyhoot.Element) -> float
+
+
+#### get_role()
+getRole(self: hoot.libpyhoot.Relation, arg0: hoot::ElementId) -> QString
+
+
+#### get_status()
+getStatus(self: hoot.libpyhoot.Element) -> hoot::Status
+
+
+#### get_status_string()
+getStatusString(self: hoot.libpyhoot.Element) -> QString
+
+
+#### get_tag()
+getTag(self: hoot.libpyhoot.Element, arg0: QString) -> QString
+
+
+#### get_tag_count()
+getTagCount(self: hoot.libpyhoot.Element) -> int
+
+
+#### get_tags()
+getTags(
+
+```
+*
+```
+
+args, 
+
+```
+**
+```
+
+kwargs)
+Overloaded function.
+
+
+1. getTags(self: hoot.libpyhoot.Element) -> hoot::Tags
+
+
+2. getTags(self: hoot.libpyhoot.Element) -> hoot::Tags
+
+
+#### get_timestamp()
+getTimestamp(self: hoot.libpyhoot.Element) -> int
+
+
+#### get_type()
+getType(self: hoot.libpyhoot.Relation) -> QString
+
+
+#### get_uid()
+getUid(self: hoot.libpyhoot.Element) -> int
+
+
+#### get_user()
+getUser(self: hoot.libpyhoot.Element) -> QString
+
+
+#### get_version()
+getVersion(self: hoot.libpyhoot.Element) -> int
+
+
+#### get_visible()
+getVisible(self: hoot.libpyhoot.Element) -> bool
+
+
+#### hasCircularError(_ = Non_ )
+
+#### hasSameNonMetadataTags(_ = Non_ )
+
+#### hasTag(_ = Non_ )
+
+#### has_circular_error()
+hasCircularError(self: hoot.libpyhoot.Element) -> bool
+
+
+#### has_same_non_metadata_tags()
+hasSameNonMetadataTags(self: hoot.libpyhoot.Element, arg0: hoot.libpyhoot.Element) -> bool
+
+Compares information tags with another element
+:param other: element to compare this element’s tags with
+:returns: true if this element has the same information tags as the other element;
+
+> false otherwise
+
+
+#### has_tag()
+hasTag(
+
+```
+*
+```
+
+args, 
+
+```
+**
+```
+
+kwargs)
+Overloaded function.
+
+
+1. hasTag(self: hoot.libpyhoot.Element, arg0: QString) -> bool
+
+
+2. hasTag(self: hoot.libpyhoot.Element, arg0: QString, arg1: QString) -> bool
+
+
+#### indexOf(_ = Non_ )
+
+#### index_of()
+indexOf(self: hoot.libpyhoot.Relation, arg0: hoot::ElementId) -> int
+
+Finds the index of a member
+
+
+* **Parameters**
+
+    **eid** – ID of the relation member
+
+
+
+* **Returns**
+
+    a numerical index
+
+
+
+#### insertElement(_ = Non_ )
+
+#### insert_element()
+insertElement(self: hoot.libpyhoot.Relation, arg0: QString, arg1: hoot::ElementId, arg2: int) -> None
+
+Inserts a relation member
+
+
+* **Parameters**
+
+    
+    * **role** – role of the member
+
+
+    * **elementId** – ID of the member
+
+
+    * **pos** – position in the relation to insert the member
+
+
+
+#### isFirstMember(_ = Non_ )
+
+#### isLastMember(_ = Non_ )
+
+#### isMultiPolygon(_ = Non_ )
+
+#### isRestriction(_ = Non_ )
+
+#### isReview(_ = Non_ )
+
+#### isUnknown(_ = Non_ )
+
+#### is_first_member()
+isFirstMember(self: hoot.libpyhoot.Relation, arg0: hoot::ElementId) -> bool
+
+Determines if the first relation member has a specified ID
+
+
+* **Parameters**
+
+    **eid** – the element ID to search for
+
+
+
+* **Returns**
+
+    true if an element having the specified ID is contained at the first relation member
+
+
+location; false otherwise
+
+
+#### is_last_member()
+isLastMember(self: hoot.libpyhoot.Relation, arg0: hoot::ElementId) -> bool
+
+Determines if the last relation member has a specified ID
+
+
+* **Parameters**
+
+    **eid** – the element ID to search for
+
+
+
+* **Returns**
+
+    true if an element having the specified ID is contained at the last relation member
+
+
+location; false otherwise
+
+
+#### is_multi_polygon()
+isMultiPolygon(self: hoot.libpyhoot.Relation) -> bool
+
+Returns true if this is a multipolygon type. No checking is done to determine if the geometry
+is valid.
+
+
+#### is_restriction()
+isRestriction(self: hoot.libpyhoot.Relation) -> bool
+
+
+#### is_review()
+isReview(self: hoot.libpyhoot.Relation) -> bool
+
+Returns true if this is a review.
+
+
+#### is_unknown()
+isUnknown(self: hoot.libpyhoot.Element) -> bool
+
+
+#### memberIdAt(_ = Non_ )
+
+#### member_id_at()
+memberIdAt(self: hoot.libpyhoot.Relation, arg0: int) -> hoot::ElementId
+
+Retrieves the relation member element at a specified index
+
+
+* **Parameters**
+
+    **index** – the index to retrieve the element member from
+
+
+
+* **Returns**
+
+    a valid element, if found; an invalid element otherwise
+
+
+
+#### numElementsByRole(_ = Non_ )
+
+#### num_elements_by_role()
+numElementsByRole(self: hoot.libpyhoot.Relation, arg0: QString) -> int
+
+Returns the number of member elements with the given relation role
+
+
+* **Parameters**
+
+    **role** – role by which to examine elements
+
+
+
+* **Returns**
+
+    the number of member elements with the specified role
+
+
+
+#### removeTag(_ = Non_ )
+
+#### remove_tag()
+removeTag(self: hoot.libpyhoot.Element, arg0: QString) -> None
+
+
+#### setChangeset(_ = Non_ )
+
+#### setCircularError(_ = Non_ )
+
+#### setId(_ = Non_ )
+
+#### setMembers(_ = Non_ )
+
+#### setStatus(_ = Non_ )
+
+#### setTag(_ = Non_ )
+
+#### setTags(_ = Non_ )
+
+#### setTimestamp(_ = Non_ )
+
+#### setType(_ = Non_ )
+
+#### setUid(_ = Non_ )
+
+#### setUser(_ = Non_ )
+
+#### setVersion(_ = Non_ )
+
+#### setVisible(_ = Non_ )
+
+#### set_changeset()
+setChangeset(self: hoot.libpyhoot.Element, arg0: int) -> None
+
+
+#### set_circular_error()
+setCircularError(self: hoot.libpyhoot.Element, arg0: float) -> None
+
+
+#### set_id()
+setId(self: hoot.libpyhoot.Element, arg0: int) -> None
+
+
+#### set_members()
+setMembers(self: hoot.libpyhoot.Relation, arg0: List[hoot::RelationData::Entry]) -> None
+
+
+#### set_status()
+setStatus(
+
+```
+*
+```
+
+args, 
+
+```
+**
+```
+
+kwargs)
+Overloaded function.
+
+
+1. setStatus(self: hoot.libpyhoot.Element, arg0: hoot::Status) -> None
+
+
+2. setStatus(self: hoot.libpyhoot.Element, arg0: int) -> None
+
+
+#### set_tag()
+setTag(self: hoot.libpyhoot.Element, arg0: QString, arg1: QString) -> None
+
+
+#### set_tags()
+setTags(self: hoot.libpyhoot.Element, arg0: hoot::Tags) -> None
+
+
+#### set_timestamp()
+setTimestamp(self: hoot.libpyhoot.Element, arg0: int) -> None
+
+
+#### set_type()
+setType(self: hoot.libpyhoot.Relation, arg0: QString) -> None
+
+Sets the “type” of the relation. See the OSM wiki [1] for a detailed description. Example
+types include “building”, “multipolygon” and “multilinestring”.
+
+
+1. [http://wiki.openstreetmap.org/wiki/Relation](http://wiki.openstreetmap.org/wiki/Relation)
+
+
+#### set_uid()
+setUid(self: hoot.libpyhoot.Element, arg0: int) -> None
+
+
+#### set_user()
+setUser(self: hoot.libpyhoot.Element, arg0: QString) -> None
+
+
+#### set_version()
+setVersion(self: hoot.libpyhoot.Element, arg0: int) -> None
+
+
+#### set_visible()
+setVisible(self: hoot.libpyhoot.Element, arg0: bool) -> None
+
+
+#### toString(_ = Non_ )
+
+#### to_string()
+toString(self: hoot.libpyhoot.Relation) -> QString
+
+
+#### visitRo(_ = Non_ )
+
+#### visitRw(_ = Non_ )
+
+#### visit_ro()
+visitRo(self: hoot.libpyhoot.Relation, arg0: hoot::ElementProvider, arg1: hoot::ConstElementVisitor, arg2: bool) -> None
+
+@see Element
+
+
+#### visit_rw()
+visitRw(self: hoot.libpyhoot.Relation, arg0: hoot::ElementProvider, arg1: hoot::ConstElementVisitor, arg2: bool) -> None
+
+@see Element
+
+
 ### _class_ hoot.libpyhoot.RemoveElementsVisitor()
-Bases: `hoot.libpyhoot.ElementVisitor`
+Bases: `ElementVisitor`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -5842,13 +6562,13 @@ setRecursive(self: hoot.libpyhoot.RemoveElementsVisitor, arg0: bool) -> None
 
 
 ### _class_ hoot.libpyhoot.RemoveMissingElementsVisitor()
-Bases: `hoot.libpyhoot.ElementVisitor`
+Bases: `ElementVisitor`
 
 
 #### \__init__(self: hoot.libpyhoot.RemoveMissingElementsVisitor)
 
 ### _class_ hoot.libpyhoot.ReplaceElementOp()
-Bases: `hoot.libpyhoot.ConstOsmMapOperation`
+Bases: `ConstOsmMapOperation`
 
 
 #### \__init__(self: hoot.libpyhoot.ReplaceElementOp, arg0: hoot.libpyhoot.ElementId, arg1: hoot.libpyhoot.ElementId)
@@ -5856,7 +6576,7 @@ Bases: `hoot.libpyhoot.ConstOsmMapOperation`
 #### apply(self: hoot.libpyhoot.ConstOsmMapOperation, arg0: hoot.libpyhoot.OsmMap)
 
 ### _class_ hoot.libpyhoot.ReviewMarker()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.ReviewMarker)
@@ -5946,7 +6666,7 @@ Removes a single element.
 
 
 ### _class_ hoot.libpyhoot.SchemaVertex()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.SchemaVertex)
@@ -6169,7 +6889,7 @@ toString(self: hoot.libpyhoot.SchemaVertex) -> QString
 
 
 ### _class_ hoot.libpyhoot.Settings()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -6224,7 +6944,7 @@ Overloaded function.
 
 
 ### _class_ hoot.libpyhoot.Soundex()
-Bases: `hoot.libpyhoot.StringDistance`
+Bases: `StringDistance`
 
 
 #### \__init__(self: hoot.libpyhoot.Soundex)
@@ -6235,7 +6955,7 @@ distance between two strings.
 
 
 ### _class_ hoot.libpyhoot.Status()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### CONFLATED(_ = <TypeEnum.CONFLATED: 3_ )
@@ -6247,7 +6967,7 @@ Bases: `pybind11_builtins.pybind11_object`
 #### TAGCHANGE(_ = <TypeEnum.TAGCHANGE: 4_ )
 
 #### _class_ TypeEnum()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 Members:
 
@@ -6341,8 +7061,79 @@ It is a lot easier to change this when the users want different text output
 instead of changing “toString” and all of code, unit tests etc that rely on it.
 
 
+### _class_ hoot.libpyhoot.StatusCriterion()
+Bases: `ElementCriterion`
+
+
+#### \__init__(\*args, \*\*kwargs)
+Overloaded function.
+
+
+1. __init__(self: hoot.libpyhoot.StatusCriterion) -> None
+
+
+2. __init__(self: hoot.libpyhoot.StatusCriterion, arg0: hoot::Settings) -> None
+
+
+3. __init__(self: hoot.libpyhoot.StatusCriterion, arg0: Dict[QString, QString]) -> None
+
+This constructor takes a Python dict of strings and uses it to initialize the set_configuration
+function.
+
+
+1. __init__(self: hoot.libpyhoot.StatusCriterion, arg0: hoot::Status) -> None
+
+
+#### clone(self: hoot.libpyhoot.ElementCriterion)
+
+#### isSatisfied(_ = Non_ )
+
+#### is_satisfied()
+isSatisfied(
+
+```
+*
+```
+
+args, 
+
+```
+**
+```
+
+kwargs)
+Overloaded function.
+
+
+1. isSatisfied(self: hoot.libpyhoot.ElementCriterion, arg0: hoot::Element) -> bool
+
+
+2. isSatisfied(self: hoot.libpyhoot.ElementCriterion, arg0: List[hoot::Element]) -> numpy.ndarray[bool]
+
+This override to the isSatisfied function is pyhoot specific and allows you to calculate
+satisfaction on an array of values in one pass.
+
+Returns:
+
+    a boolean numpy array
+
+
+#### setConfiguration(_ = Non_ )
+
+#### set_configuration()
+setConfiguration(self: hoot.libpyhoot.StatusCriterion, arg0: hoot::Settings) -> None
+
+Set the configuration for this object.
+
+
+#### toString(_ = Non_ )
+
+#### to_string()
+toString(self: hoot.libpyhoot.ElementCriterion) -> QString
+
+
 ### _class_ hoot.libpyhoot.StatusEqualsExtractor()
-Bases: `hoot.libpyhoot.FeatureExtractor`
+Bases: `FeatureExtractor`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -6403,7 +7194,7 @@ toString(self: hoot.libpyhoot.FeatureExtractor) -> QString
 
 
 ### _class_ hoot.libpyhoot.StringDistance()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -6414,7 +7205,7 @@ distance between two strings.
 
 
 ### _class_ hoot.libpyhoot.SuperfluousNodeRemover()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -6444,7 +7235,7 @@ Set the configuration for this object.
 
 
 ### _class_ hoot.libpyhoot.TagCriterion()
-Bases: `hoot.libpyhoot.ElementCriterion`
+Bases: `ElementCriterion`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -6515,7 +7306,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.TagKeyCriterion()
-Bases: `hoot.libpyhoot.ElementCriterion`
+Bases: `ElementCriterion`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -6586,7 +7377,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.TagMatchExtractor()
-Bases: `hoot.libpyhoot.FeatureExtractor`
+Bases: `FeatureExtractor`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -6647,7 +7438,7 @@ toString(self: hoot.libpyhoot.FeatureExtractor) -> QString
 
 
 ### _class_ hoot.libpyhoot.TagMergerFactory()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.TagMergerFactory)
@@ -6691,7 +7482,7 @@ kwargs)
 Overloaded function.
 
 
-1. mergeTags(arg0: hoot.libpyhoot.Tags, arg1: hoot.libpyhoot.Tags, arg2: hoot::ElementType) -> hoot.libpyhoot.Tags
+1. mergeTags(arg0: hoot.libpyhoot.Tags, arg1: hoot.libpyhoot.Tags, arg2: hoot.libpyhoot.ElementType) -> hoot.libpyhoot.Tags
 
 A convenience function for merging tags using the default mechanism. Equivalent to:
 TagMergerFactory::getInstance().getDefault().mergeTags(t1, t2, et);
@@ -6716,7 +7507,7 @@ Return the list of mergers as a string
 
 
 ### _class_ hoot.libpyhoot.Tags()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### Tags(_ = Non_ )
@@ -7414,18 +8205,9 @@ Converts a list of KVPs into tags
 
 
 
-#### toKeys(_ = Non_ )
-
 #### toKvps(_ = Non_ )
 
 #### to_dict(self: hoot.libpyhoot.Tags)
-
-#### to_keys()
-toKeys(self: hoot.libpyhoot.Tags) -> QStringList
-
-toKeys returns the tags as a list of key strings
-:returns: a list of key strings
-
 
 #### to_kvps()
 toKvps(self: hoot.libpyhoot.Tags) -> QStringList
@@ -7446,7 +8228,7 @@ uuidKey() -> QString
 
 
 ### _class_ hoot.libpyhoot.TestUtils()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.TestUtils)
@@ -7512,7 +8294,7 @@ Converts a string into a format that can be cut/paste into c++ code.
 
 
 ### _class_ hoot.libpyhoot.ToEnglishTranslateStringDistance()
-Bases: `hoot.libpyhoot.StringDistance`
+Bases: `StringDistance`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -7564,7 +8346,7 @@ setStringDistance(self: hoot.libpyhoot.ToEnglishTranslateStringDistance, arg0: h
 
 
 ### _class_ hoot.libpyhoot.UnifyingConflator()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(self: hoot.libpyhoot.UnifyingConflator)
@@ -7602,7 +8384,7 @@ getNumSteps(self: hoot.libpyhoot.UnifyingConflator) -> int
 
 
 ### _class_ hoot.libpyhoot.Version()
-Bases: `pybind11_builtins.pybind11_object`
+Bases: `pybind11_object`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -7632,7 +8414,7 @@ getVersion() -> str
 
 
 ### _class_ hoot.libpyhoot.WayNodeCriterion()
-Bases: `hoot.libpyhoot.ElementCriterion`
+Bases: `ElementCriterion`
 
 
 #### \__init__(\*args, \*\*kwargs)
@@ -7692,7 +8474,7 @@ toString(self: hoot.libpyhoot.ElementCriterion) -> QString
 
 
 ### _class_ hoot.libpyhoot.WeightedWordDistance()
-Bases: `hoot.libpyhoot.StringDistance`
+Bases: `StringDistance`
 
 
 #### \__init__(\*args, \*\*kwargs)

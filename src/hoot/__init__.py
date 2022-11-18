@@ -17,11 +17,12 @@ import os
 from os.path import exists, join
 
 # Make sure we're using the right hoot home.
-if "HOOT_HOME" in os.environ:
+if "HOOT_HOME" in os.environ and os.environ["HOOT_HOME"].strip() != "":
     HOOT_HOME = os.environ["HOOT_HOME"]
 else:
     HOOT_HOME = os.path.join(os.path.abspath(os.path.dirname(__file__)))
     os.environ["HOOT_HOME"] = HOOT_HOME
+#print("HOOT_HOME: " + HOOT_HOME)
 
 # Point ICU data to the hoot conf directory
 if "ICU_DATA" not in os.environ:
@@ -38,7 +39,6 @@ It appears that one or more data files are missing. To download the data files
 run:
     python -m hoot download-data
 """)
-
 
 # We have to ensure the environment is set properly before importing libpyhoot
 # pylint: disable=wrong-import-position

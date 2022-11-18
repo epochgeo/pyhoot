@@ -157,5 +157,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# custom
 src/hoot/conf/
 src/hoot/proj.db
+.install
+ToyTestOut.osm
+out.osm
+proj.db
