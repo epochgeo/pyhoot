@@ -60,7 +60,8 @@ install: ._install
 	python -m pip install --force $(FINAL_WHEEL)
 	touch .install
 
-# TODO: HOOT_HOME must be set to manually to "~/.pyenv/versions/3.7.14/lib/python3.7/site-packages/hoot" for this to work
+# TODO: HOOT_HOME must be set to manually to 
+# "~/.pyenv/versions/3.7.14/lib/python3.7/site-packages/hoot" for this to work.
 testfinal: ._install
 	python -m hoot conflate $(HOOT_HOME)/ToyTestA.osm $(HOOT_HOME)/ToyTestA.osm ToyTestOut.osm
 	python -W ignore -m unittest discover -s tests/hoot/py
@@ -81,14 +82,14 @@ uploadtest: ${FINAL_WHEEL}
 	# See https://packaging.python.org/en/latest/tutorials/packaging-projects/
 	# for details
 	# To install use:
-	# python -m pip install --index-url https://test.pypi.org/simple/ hoot \
-	#   --upgrade --force
+	# python -m pip install --index-url https://test.pypi.org/simple/ hoot --upgrade --force
 	python3 -m twine upload -u __token__ -p $$TWINE_TOKEN --repository testpypi $(FINAL_WHEEL)
 	
 uploadfinal: ${FINAL_WHEEL}
 	python3 -m pip install --upgrade twine
 	# you can set TWINE_USERNAME & TWINE_PASSWORD to avoid the prompt
-	python3 -m twine upload $(FINAL_WHEEL)
+	#python3 -m twine upload $(FINAL_WHEEL)
+	python3 -m twine upload -u __token__ -p $$TWINE_TOKEN $(FINAL_WHEEL)
 
 unzipfinal: $(FINAL_WHEEL)
 	rm -rf tmp/unzipfinal

@@ -11,6 +11,5 @@ class TestConflateCase(unittest.TestCase):
 
     def test_basic(self):
         hoot.Log.get_instance().set_level(hoot.Log.WARN)
-        hoot.warn("TestConflateCase")
         result = hoot.ConflateCaseTestSuite.run_dir("test-files/cases")
         self.assertTrue(result)

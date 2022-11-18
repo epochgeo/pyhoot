@@ -90,7 +90,6 @@ class TestGenericPoi(unittest.TestCase):
     def test_basic(self):
 
         hoot.Log.get_instance().set_level(hoot.Log.WARN)
-        hoot.warn("TestGenericPoi")
 
         # Enable linear programming optimization to avoid an obscure bug
         hoot.conf()["unify.enable.optimal.constrained.matches"] = "true"

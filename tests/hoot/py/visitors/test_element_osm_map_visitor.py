@@ -21,7 +21,6 @@ class TestElementOsmMapVisitor(unittest.TestCase):
         """
 
         hoot.Log.get_instance().set_level(hoot.Log.WARN)
-        hoot.warn("TestElementOsmMapVisitor")
 
         hoot.OsmMap.reset_counters()
         osm_map = hoot.OsmMap()

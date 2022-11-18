@@ -153,8 +153,9 @@ class CMakeBuild(build_ext):
         copyfile(src_file, dest_file)
         copymode(src_file, dest_file)
 
+# TODO: make the version be read from the VERSION file again
 setup(name = 'hoot',
-        version = "0.2.64.4",
+        version = "0.2.64.6",
         description = 'This is an unofficial wrapper of Hootenanny',
         long_description = open("README.md").read(),
         long_description_content_type = "text/markdown",
