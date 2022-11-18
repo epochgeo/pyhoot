@@ -16,13 +16,17 @@ from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 from setuptools.command.test import test as TestCommand
 
-PYHOOT_VERSION = open(os.path.join(Path(__file__).parent.resolve(), "VERSION")).read()
+#print(__file__)
+#print(Path(__file__).parent.resolve())
+# TODO: fix
+#PYHOOT_VERSION = open(os.path.join(Path(__file__).parent.resolve(), "VERSION")).read()
+PYHOOT_VERSION = "0.2.64.4"
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
         Extension.__init__(self, name, sources=["libcode.version"])
         self.sourcedir = os.path.abspath(sourcedir)
-
+        print("self.sourcedir: " + self.sourcedir)
 
 class CMakeBuild(build_ext):
     def run(self):

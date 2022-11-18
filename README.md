@@ -40,7 +40,7 @@ Known Issues:
 
 ## Installation
 
-At this time, pyhoot is available for Python 3.6 and 3.7.
+At this time, pyhoot is available for Python 3.7.
 
 Installing on CentOS 7:
 
@@ -89,7 +89,7 @@ Is equivalent to the following Python:
 import hoot
 tags = hoot.Tags()
 tags["name"] = "foo"
-print(tags.get_name())
+hoot.log_var(tags.getName())
 ```
 
 Command Line Interface

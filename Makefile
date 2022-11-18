@@ -4,9 +4,8 @@
 # maintaining pyhoot. E.g. build, update on pypi, etc.
 #
 
-
 VERSION = $(shell cat VERSION)
-FINAL_WHEEL = wheelhouse/hoot-$(VERSION)-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+FINAL_WHEEL = wheelhouse/hoot-$(VERSION)-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
 
 all: build_wheel
 
@@ -45,14 +44,14 @@ docs/710_api_documentation.md: .force
 
 # do a quick install that won't test the final version
 quick: ._quick
-._quick: dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
-	python -m pip install --force dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
+._quick: dist/hoot-$(VERSION)-cp37-cp37m-linux_x86_64.whl
+	python -m pip install --force dist/hoot-$(VERSION)-cp37-cp37m-linux_x86_64.whl
 	touch .quick
 
 # build and install a "quick" wheel. This uses references to local libraries
 installquick: ._installquick
 ._installquick: ._quick
-	python -m pip install --force dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
+	python -m pip install --force dist/hoot-$(VERSION)-cp37-cp37m-linux_x86_64.whl
 	touch .installquick
 
 # install the production wheel locally
@@ -65,11 +64,11 @@ testfinal: ._install
 	python -m hoot conflate tmp/ToyTestA.osm tmp/ToyTestA.osm tmp/ToyTestOut.osm
 	python -W ignore -m unittest discover -s tests/hoot/py
 
-$(FINAL_WHEEL): dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
+$(FINAL_WHEEL): dist/hoot-$(VERSION)-cp37-cp37m-linux_x86_64.whl
     # For some reason it can't find libjvm w/o LD_LIBRARY_PATH being specified.
-	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/jvm/java/jre/lib/amd64/server/ auditwheel repair --plat manylinux_2_17_x86_64 dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl
+	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/jvm/java/jre/lib/amd64/server/ auditwheel repair --plat manylinux_2_17_x86_64 dist/hoot-$(VERSION)-cp37-cp37m-linux_x86_64.whl
 
-dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl: $(wildcard src/**/*) README.md
+dist/hoot-$(VERSION)-cp37-cp37m-linux_x86_64.whl: $(wildcard src/**/*) README.md
 	rm -rf dist
 	python -m build -n
 	twine check dist/*
@@ -96,7 +95,7 @@ unzipfinal: $(FINAL_WHEEL)
 
 unzipquick: .quick
 	rm -rf tmp/unzip
-	unzip dist/hoot-$(VERSION)-cp36-cp36m-linux_x86_64.whl -d tmp/unzip
+	unzip dist/hoot-$(VERSION)-cp37-cp37m-linux_x86_64.whl -d tmp/unzip
 
 local: src/hoot/libpyhoot.so
 
