@@ -76,9 +76,6 @@ dist/hoot-$(VERSION)-cp37-cp37m-linux_x86_64.whl: $(wildcard src/**/*) README.md
 	twine check dist/*
 
 uploadtest: ${FINAL_WHEEL}
-#   Don't need HootTest in production. The executable is being removed in setup.py but couldn't find
-#   anywhere else to remove the library than here, since its needed to run tests locally.
-	zip -d $(FINAL_WHEEL) "hoot.libs/libHootTest*.so"
 	python3 -m pip install --upgrade twine
 	# Set TWINE_TOKEN to the giant token assigned by test.pypi.org. It starts
 	# with pypi-
@@ -86,7 +83,6 @@ uploadtest: ${FINAL_WHEEL}
 	# for details
 	# To install use:
 	# python -m pip install --index-url https://test.pypi.org/simple/ hoot --upgrade --force
-	python3 -m twine upload -u __token__ -p $$TWINE_TOKEN --repository testpypi $(FINAL_WHEEL)
 	
 uploadfinal: ${FINAL_WHEEL}
 	python3 -m pip install --upgrade twine
