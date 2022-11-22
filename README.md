@@ -37,6 +37,10 @@ As/if pyhoot matures and regression tests are put into place, these issues will 
 Known Issues:
 
 1. GLPK gives an unexpected segfault so GLPK based optimization is disabled by default.
+2. HOOT_HOME is not being properly set in every environment. On Amazon Linux:
+```
+export HOOT_HOME=/home/ec2-user/.local/lib/python3.7/site-packages/hoot
+```
 
 ## Installation
 
@@ -45,7 +49,7 @@ At this time, pyhoot is available for Python 3.7.
 Installing on CentOS 7:
 
 ```
-sudo yum install libSM libX11 lzma-sdk-dev
+sudo yum install libSM libX11 lzma-sdk-dev libXext libXrender
 python3 -m pip install hoot
 ```
 
