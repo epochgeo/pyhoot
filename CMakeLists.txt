@@ -31,7 +31,7 @@ list(APPEND CONAN_LIBS libicui18n.a libicuuc.a)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
-find_package(Python3 3.6...<3.8 COMPONENTS Development)
+find_package(Python3 3.7...<3.8 COMPONENTS Development)
 
 list(REMOVE_ITEM CONAN_LIBS
     wayland-server wayland-cursor wayland-egl wayland-client 
@@ -70,7 +70,6 @@ target_link_libraries(
     HootCore
     ${Python3_LIBRARIES}
     ${CONAN_LIBS}
-    #${CONAN_LIBS_HOOTENANNY}
 )
 target_precompile_headers(
     pyhoot

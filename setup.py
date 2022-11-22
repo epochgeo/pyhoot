@@ -100,6 +100,7 @@ class CMakeBuild(build_ext):
         self.copy_dir(f"{self.build_temp}/rules", f"{lib_dir}/hoot/rules")
         self.copy_dir(f"{self.build_temp}/bin", f"{lib_dir}/hoot/bin")
         # We don't need HootTest and it is kinda big
+        #print("lib_dir: " + f"{lib_dir}")
         os.system(f"rm -f {lib_dir}/hoot/bin/HootTest")
         self.copy_dir(f"{self.build_temp}/gdal", f"{lib_dir}/hoot/gdal")
         copyfile(f"{self.build_temp}/bin/RunHoot.sh",

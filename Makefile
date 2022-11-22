@@ -61,7 +61,7 @@ install: ._install
 	touch .install
 
 # TODO: HOOT_HOME must be set to manually to 
-# "~/.pyenv/versions/3.7.14/lib/python3.7/site-packages/hoot" for this to work.
+# "~/.pyenv/versions/3.7.14/lib/python3.7/site-packages/hoot" on my box for this to work. - BDW
 testfinal: ._install
 	python -m hoot conflate $(HOOT_HOME)/ToyTestA.osm $(HOOT_HOME)/ToyTestA.osm ToyTestOut.osm
 	python -W ignore -m unittest discover -s tests/hoot/py
@@ -76,6 +76,9 @@ dist/hoot-$(VERSION)-cp37-cp37m-linux_x86_64.whl: $(wildcard src/**/*) README.md
 	twine check dist/*
 
 uploadtest: ${FINAL_WHEEL}
+#   Don't need HootTest in production. The executable is being removed in setup.py but couldn't find
+#   anywhere else to remove the library than here, since its needed to run tests locally.
+	zip -d $(FINAL_WHEEL) "hoot.libs/libHootTest*.so"
 	python3 -m pip install --upgrade twine
 	# Set TWINE_TOKEN to the giant token assigned by test.pypi.org. It starts
 	# with pypi-
