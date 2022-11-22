@@ -83,6 +83,7 @@ uploadtest: ${FINAL_WHEEL}
 	# for details
 	# To install use:
 	# python -m pip install --index-url https://test.pypi.org/simple/ hoot --upgrade --force
+	python3 -m twine upload -u __token__ -p $$TWINE_TOKEN --repository testpypi $(FINAL_WHEEL)
 	
 uploadfinal: ${FINAL_WHEEL}
 	python3 -m pip install --upgrade twine
