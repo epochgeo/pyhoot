@@ -77,8 +77,10 @@ using SearchRadiusFunction = std::function<Meters(const ConstElementPtr& e)>;
 /**
  * PythonCreatorDescription describes a python script creator. E.g. the callback functions, name
  * etc.
+ * 
+ * The visibility attribute gets rid of a warning during compile
  */
-class PythonCreatorDescription
+class __attribute__ ((visibility("hidden"))) PythonCreatorDescription
 {
 public:
   PythonCreatorDescription();
