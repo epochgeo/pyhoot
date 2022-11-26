@@ -222,12 +222,13 @@ void PythonMatchCreator::createMatches(
       map->visitRelationsRo(*v);
       break;
     case CreatorDescription::BaseFeatureType::PoiPolygonPOI:
-      map->visitRo(*v);
+      map->visitNodesRo(*v);
+      map->visitWaysRo(*v);
       break;
     default:
       // visit all geometry types if the script didn't identify its geometry
       LOG_INFO("Unrecognized geometry type, scanning all elements.");
-      LOG_INFO(" Please call PythonCreatorDescription.description.set_geometry_type")
+      LOG_INFO(" Please call PythonCreatorDescription.description.set_base_feature_type with an input other than UNKNOWN.")
       map->visitRo(*v);
       break;
   }

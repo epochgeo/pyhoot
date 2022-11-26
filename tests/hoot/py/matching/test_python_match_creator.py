@@ -73,6 +73,8 @@ class PythonMatchCreatorTest(unittest.TestCase):
         creator = hoot.PythonCreatorDescription()
         creator.criterion = hoot.PoiCriterion()
         creator.description.set_class_name("SimpleNameConflator")
+        creator.description.set_base_feature_type(
+            hoot.CreatorDescription.POI)
         creator.search_radius = 5
         creator.is_match_candidate = foo.is_match_candidate
         creator.extract_features = foo.extract_features

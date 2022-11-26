@@ -63,6 +63,8 @@ class ExampleGenericPoi:
 
         creator = hoot.PythonCreatorDescription()
         creator.description.set_class_name(ExampleGenericPoi.__name__)
+        creator.description.set_base_feature_type(
+            hoot.CreatorDescription.POI)
         creator.criterion = hoot.PoiCriterion()
         creator.is_match_candidate = example.is_match_candidate
         creator.match_score = example.match_score
