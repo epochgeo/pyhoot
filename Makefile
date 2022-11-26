@@ -25,7 +25,7 @@ build_wheel: $(FINAL_WHEEL)
 # Run pyhoot unit tests on a local build of pyhoot.
 test: local build/conf/dictionary/words.sqlite
 	HOOT_HOME=`pwd`/build PYTHONPATH=`pwd`/build/lib/:`pwd`/src/ \
-	python -W ignore -m unittest discover -s tests/hoot/py
+	python -m unittest discover -s tests/hoot/py
 
 docs: docs/PyHootManual.pdf
 
