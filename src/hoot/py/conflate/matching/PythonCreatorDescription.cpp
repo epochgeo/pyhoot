@@ -137,7 +137,6 @@ PythonCreatorDescription::~PythonCreatorDescription()
 
 void PythonCreatorDescription::clear()
 {
-  LOG_TRACE("clear");
   _desc = nullptr;
   _initFunc = nullptr;
   _isMatchCandidateFunc = nullptr;
