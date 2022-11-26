@@ -76,6 +76,7 @@ int RunCommand(QString cmd, QStringList args)
   }
   else
   {
+    // Calls to HelpCmd won't work b/c we're not building the hoot-cmd library which it is in.
     command = Factory::getInstance().constructObject<Command>("HelpCmd");
     command->run(argv.data(), argv.size());
     result = -1;

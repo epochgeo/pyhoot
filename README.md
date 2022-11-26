@@ -37,10 +37,12 @@ As/if pyhoot matures and regression tests are put into place, these issues will 
 Known Issues:
 
 1. GLPK gives an unexpected segfault so GLPK based optimization is disabled by default.
-2. HOOT_HOME is not being properly set in every environment. On Amazon Linux:
+2. HOOT_HOME is not being properly set in every environment. On Amazon Linux set it with:
 ```
 export HOOT_HOME=/home/ec2-user/.local/lib/python3.7/site-packages/hoot
 ```
+3. pyhoot is built from Hootenanny 0.2.64. Upgrading to a later version of Hootenanny is not a 
+trivial process, so regular upgrades are not currently planned but may be possible in the future.
 
 ## Installation
 
@@ -102,7 +104,6 @@ Command Line Interface
 The Hootenanny CLI is conveniently wrapped in a python call:
 
 ```
-python -m hoot help
 python -m hoot conflate $HOOT_HOME/ToyTestA.osm $HOOT_HOME/ToyTestB.osm out.osm
 ```
 
