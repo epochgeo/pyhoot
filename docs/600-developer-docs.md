@@ -17,6 +17,7 @@ Then, install pyhoot and run the tests. This will build all the C++ bindings and
 source /opt/rh/devtoolset-8/enable
 export HOOT_HOME=/home/vagrant/pyhoot/build/
 export ICU_DATA=/home/vagrant/pyhoot/build/res
+pip install wheel patchelf
 cd pyhoot
 make
 python -m hoot download-data
@@ -25,16 +26,16 @@ make test
 
 To create an installation package:
 ```
-pip install wheel patchelf
-make install
+make -j$(nproc) install
 ```
 
-To test deploy the installation package (see instructions in Makefile):
+To test deploy the installation package (see further instructions in Makefile target):
 ```
 make uploadtest
 ```
 
-To deploy the actual installation package (deploy to test first ot be safe):
+To deploy the actual installation package (see further instructions in Makefile target; deploy to 
+test repo first to be safe):
 ```
 make uploadfinal
 ```
