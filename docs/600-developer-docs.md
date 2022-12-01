@@ -30,15 +30,17 @@ make -j$(nproc) install
 ```
 
 To test deploy the installation package (see further instructions in Makefile target):
+* Update `VERSION` with the new version.
+* Update the `setup.py` `setup` method with the new version (TODO: temporary).
+* Upload a test version to https://test.pypi.org/project/hoot/<version>
 ```
 make uploadtest
 ```
 
 To deploy the actual installation package (see further instructions in Makefile target; deploy to 
 test repo first to be safe):
+* Follow the steps above to update the software version.
+* Upload a production version to https://pypi.org/project/hoot/<version>:
 ```
 make uploadfinal
 ```
-
-
-
