@@ -19,7 +19,7 @@ export HOOT_HOME=/home/vagrant/pyhoot/build/
 export ICU_DATA=/home/vagrant/pyhoot/build/res
 pip install wheel patchelf
 cd pyhoot
-make
+make clean && make
 python -m hoot download-data
 make test
 ```
