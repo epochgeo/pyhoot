@@ -204,7 +204,9 @@ void PythonMatchVisitor::checkForMatch(const ConstElementPtr& e)
 
     ConstElementPtr e2 = map->getElement(eid);
     LOG_VART(e->getTags().getName());
+    LOG_VART(e->getStatus());
     LOG_VART(e->getElementId());
+    LOG_VART(e2->getStatus());
     LOG_VART(e2->getTags().getName());
     LOG_VART(e2->getElementId());
 
@@ -217,8 +219,11 @@ void PythonMatchVisitor::checkForMatch(const ConstElementPtr& e)
     LOG_VART(isCorrectOrder(e, e2));
     LOG_VART(isMatchCandidate(e2));
     // TODO fix me, see PythonCreatorDescription::setMatchFromCriterion
-    attemptToMatch = (e2->getStatus() == Status::Unknown1 || isCorrectOrder(e, e2)) &&
-      isMatchCandidate(e2);
+    // attemptToMatch = (e2->getStatus() == Status::Unknown1 || isCorrectOrder(e, e2)) &&
+    //   isMatchCandidate(e2);
+    // Skipping the isCorrectOrder stipulation since Unknown1 will always be considered to be the
+    // reference dataset for now.
+    attemptToMatch = e2->getStatus() == Status::Unknown1 && isMatchCandidate(e2);
     LOG_VART(attemptToMatch);
 
     if (attemptToMatch)
