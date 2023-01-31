@@ -92,7 +92,7 @@ class TestGenericPoi(unittest.TestCase):
         hoot.Log.get_instance().set_level(hoot.Log.WARN)
 
         # Enable linear programming optimization to avoid an obscure bug
-        hoot.conf()["unify.enable.optimal.constrained.matches"] = "true"
+        #hoot.conf()["unify.enable.optimal.constrained.matches"] = "true"
         #hoot.conf()["debug.maps.write"] = True
         # This doesn't seem to be getting set. Would like to be able retain all ID's.
         #hoot.conf()["conflate.use.data.source.ids.2"] = True

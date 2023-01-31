@@ -65,11 +65,6 @@ class PythonMatchCreatorTest(unittest.TestCase):
         foo = SimpleNameConflator()
         hoot.OsmMap.reset_counters()
 
-        # Enable linear programming optimization to avoid an obscure bug
-        hoot.conf()["unify.enable.optimal.constrained.matches"] = "true"
-        #hoot.conf()["debug.maps.write"] = True
-        hoot.conf()["tag.merger.default"] = "OverwriteTag2Merger"
-
         creator = hoot.PythonCreatorDescription()
         creator.criterion = hoot.PoiCriterion()
         creator.description.set_class_name("SimpleNameConflator")
