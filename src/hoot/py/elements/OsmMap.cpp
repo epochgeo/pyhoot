@@ -65,6 +65,8 @@ If the visitor implements OsmMapConsumer then setOsmMap will be called before
 visiting any elements.
 )TOK")
     .def("visitRw", [](OsmMap& self, ConstElementVisitor& v) { self.visitRw(v); })
+    .def("getNode",
+        static_cast<NodePtr (OsmMap::*)(const ElementId&)>(&OsmMap::getNode))
     .def("getNodes", [](OsmMap& self) {
       return std::map<long, ElementPtr>(self.getNodes().begin(), self.getNodes().end());
     })

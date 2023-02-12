@@ -10,6 +10,7 @@
 #include <hoot/core/elements/Element.h>
 #include <hoot/core/elements/ElementProvider.h>
 #include <hoot/core/elements/Relation.h>
+#include <hoot/core/elements/Node.h>
 #include <hoot/core/visitors/ConstElementVisitor.h>
 
 #include <hoot/py/bindings/QtBindings.h>
@@ -233,6 +234,13 @@ types include "building", "multipolygon" and "multilinestring".
 )TOK")
     ;
   PyBindModule::remapNames(relation);
+
+  auto node = py::class_<hoot::Node, std::shared_ptr<Node> >(m, "Node", element)
+    .def_static("className", &Node::className)
+    .def("getX", &Node::getX)
+    .def("getY", &Node::getY)
+    ;
+  PyBindModule::remapNames(node);
 }
 
 REGISTER_PYHOOT_SUBMODULE(init_Element)
