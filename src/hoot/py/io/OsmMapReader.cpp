@@ -10,6 +10,7 @@
 
 #include <hoot/core/io/OsmMapReader.h>
 #include <hoot/core/io/OsmJsonReader.h>
+#include <hoot/core/io/OsmXmlReader.h>
 
 #include <hoot/py/bindings/QtBindings.h>
 #include <hoot/py/bindings/PyBindModule.h>
@@ -79,17 +80,6 @@ loadFromFile - Reads the whole file as a string, passes it
 :param path: - Path to file
 :returns: Smart pointer to the OSM map
 )TOK")
-//     .def_static("scrubQuotes", &OsmJsonReader::scrubQuotes, R"TOK(
-// scrubQuotes Converts single quotes to double quotes, and escaped
-//         apostrophes to regular apostrophes
-// :param jsonStr: proper JSON string
-// )TOK")
-//     .def_static("scrubBigInts", &OsmJsonReader::scrubBigInts, R"TOK(
-// scrubBigInts Ensures that we have quotes around big integers.
-//        Numbers > 2^31 seem to cause trouble with the boost property_tree
-//        json parser in boost 1.41
-// :param jsonStr: string upon which we operate
-// )TOK")
     .def("supportedFormats", &OsmJsonReader::supportedFormats)
     .def("setConfiguration", &OsmJsonReader::setConfiguration, R"TOK(
 Set the configuration for this object.
@@ -117,6 +107,14 @@ getCopyright Copyright statement, if supplied in JSON
   ;
 
   PyBindModule::remapNames(osmJsonReader);
+
+  auto osmXmlReader = py::class_<OsmXmlReader, std::shared_ptr<OsmXmlReader> >
+    (m, "OsmXmlReader", osmMapReader)
+    .def(py::init<>())
+    .def("readFromString", &OsmXmlReader::readFromString)
+  ;
+
+  PyBindModule::remapNames(osmXmlReader);
 }
 
 REGISTER_PYHOOT_SUBMODULE(init_OsmMapReader)

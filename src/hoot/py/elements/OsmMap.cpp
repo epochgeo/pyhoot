@@ -37,15 +37,8 @@ void init_OsmMap(py::module_& m)
     .def("getElement",
         static_cast<ElementPtr (OsmMap::*)(ElementType type, long id)>(&OsmMap::getElement),
         "getElement returns an element by element type and id")
-//    .def("addElements", &OsmMap::addElements)
     .def("getElementCount", &OsmMap::getElementCount)
     .def("size", &OsmMap::size)
-//    .def("containsElement", &OsmMap::containsElement, R"TOK(
-//Returns true if an element with the specified type/id exists.
-//Throws an exception if the type is unrecognized.
-//)TOK")
-    //.def("containsElement", &OsmMap::containsElement)
-    //.def("containsElement", &OsmMap::containsElement)
     .def("visitRo", &OsmMap::visitRo, R"TOK(
 Calls the visitRo method on all elements. See Element::visitRo for a more
 thorough description.
@@ -71,25 +64,7 @@ thorough description.
 If the visitor implements OsmMapConsumer then setOsmMap will be called before
 visiting any elements.
 )TOK")
-//    .def("visitRw", [](OsmMap& self, RwVisitFunction func) {
-
-//    })
     .def("visitRw", [](OsmMap& self, ConstElementVisitor& v) { self.visitRw(v); })
-//    .def("replace", &OsmMap::replace, R"TOK(
-//Replace the all instances of from with instances of to. In some cases this may be an invalid
-//operation and an exception will be throw. E.g. replacing a node with a way where the node
-//is part of another way.
-//)TOK")
-//    .def("replace", &OsmMap::replace, R"TOK(
-//Similar to above, but from is replaced with a collection of elements. This makes sense in the
-//context of a relation, but may not make sense in other cases (e.g. replace a single node
-//that is part of a way with multiple nodes).
-//)TOK")
-  /////////////////////////////////////NODE//////////////////////////////////////////////
-//    .def("getNode", &OsmMap::getNode)
-//    .def("getNode", &OsmMap::getNode)
-//    .def("getNode", &OsmMap::getNode)
-//    .def("getNode", &OsmMap::getNode)
     .def("getNodes", [](OsmMap& self) {
       return std::map<long, ElementPtr>(self.getNodes().begin(), self.getNodes().end());
     })
@@ -110,23 +85,8 @@ removed from this OsmMap entirely.
 )TOK")
     .def("createNextNodeId", &OsmMap::createNextNodeId)
     .def("visitNodesRo", &OsmMap::visitNodesRo)
-    //.def("visitNodesRw", &OsmMap::visitNodesRw)
     .def("numNodesAppended", &OsmMap::numNodesAppended)
     .def("numNodesSkippedForAppending", &OsmMap::numNodesSkippedForAppending)
-  ///////////////////////////////////////WAY////////////////////////////////////////////////
-
-//    .def("getWay", &OsmMap::getWay, R"TOK(
-//Return the way with the specified id or null if it doesn't exist.
-//)TOK")
-//    .def("getWay", &OsmMap::getWay)
-//    .def("getWay", &OsmMap::getWay, R"TOK(
-//Similar to above but const'd.
-
-//We can't return these values by reference b/c the conversion from non-const to const requires
-//a copy. The copy would be a temporary variable if we returned a reference which creates some
-//weirdness and a warning.
-//)TOK")
-//    .def("getWay", &OsmMap::getWay)
     .def("getWays", &OsmMap::getWays)
     .def("getWayIds", &OsmMap::getWayIds)
     .def("getWayCount", &OsmMap::getWayCount)
@@ -137,12 +97,12 @@ removed from this OsmMap entirely.
     .def("visitWaysRw", &OsmMap::visitWaysRw)
     .def("numWaysAppended", &OsmMap::numWaysAppended)
     .def("numWaysSkippedForAppending", &OsmMap::numWaysSkippedForAppending)
-  ////////////////////////////////////////RELATION/////////////////////////////////////////////////
-//    .def("getRelation", &OsmMap::getRelation)
-//    .def("getRelation", &OsmMap::getRelation)
-//    .def("getRelation", &OsmMap::getRelation)
-    .def("getRelations", &OsmMap::getRelations)
-    .def("getRelationIds", &OsmMap::getRelationIds)
+    .def("getRelations", [](OsmMap& self) {
+      return std::map<long, ElementPtr>(self.getRelations().begin(), self.getRelations().end());
+    })
+    .def("getRelationIds", [](OsmMap& self) {
+      return self.getRelationIds().toList().toStdList();
+    })
     .def("getRelationCount", &OsmMap::getRelationCount)
     .def("addRelation", &OsmMap::addRelation)
     .def("containsRelation", &OsmMap::containsRelation)
@@ -151,8 +111,6 @@ removed from this OsmMap entirely.
     .def("visitRelationsRw", &OsmMap::visitRelationsRw)
     .def("numRelationsAppended", &OsmMap::numRelationsAppended)
     .def("numRelationsSkippedForAppending", &OsmMap::numRelationsSkippedForAppending)
-  /////////////////////////////////////////////////////////////////////////////////////
-
     .def("append", &OsmMap::append, R"TOK(
 Append all the elements in input map to this map.
 

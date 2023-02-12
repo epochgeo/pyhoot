@@ -159,7 +159,6 @@ Inserts a relation member
 Removes members, tags, type and circularError.
 )TOK")
     .def("getMembers", [](const Relation& self) { return self.getMembers(); })
-    .def("getMembers", &Relation::getMembers)
     .def("getMemberCount", &Relation::getMemberCount)
     .def("getMember", &Relation::getMember)
     .def("setMembers", &Relation::setMembers)
@@ -194,26 +193,6 @@ Determines if the last relation member has a specified ID
 location; false otherwise
 )TOK")
     .def("getMemberIds", [](const Relation& self) { return self.getMemberIds(); })
-    .def("getMemberIds", &Relation::getMemberIds, R"TOK(
-Returns the IDs of members
-
-:param elementType: optional element type of element Ids to return
-:returns: a collection of element IDs
-)TOK")
-    .def("getAdjoiningMemberIds", &Relation::getAdjoiningMemberIds, R"TOK(
-Retrieves the member element IDs for members placed immediately before and after the member
-element with the specified ID
-
-:param memberId: the ID of the member element to retrieve adjoining member element IDs for
-:returns: If a member with the specified ID exists 1) and is neither the first nor last member, a
-list with two elements IDs where the first ID is the ID of the member element directly
-preceding the element with the specified ID and the second ID is the ID of the member directly
-succeeding the element with the specified ID. 2) and is the first member, a list with one
-element ID where the ID is the ID of the member directly succeeding the element with the
-specified ID. 3) and is the last member, a list with one element ID where the ID is the ID of
-the member directly preceding the element with the specified ID. If the relation contains no
-member with the specified ID, then an empty list is returned.
-)TOK")
     .def("numElementsByRole", &Relation::numElementsByRole, R"TOK(
 Returns the number of member elements with the given relation role
 
