@@ -51,7 +51,7 @@ At this time, pyhoot is available for Python 3.7.
 Installing on CentOS 7:
 
 ```
-sudo yum install libSM libX11 lzma-sdk-dev libXext libXrender
+sudo yum install libSM libX11 libXext libXrender
 python3 -m pip install hoot
 ```
 
