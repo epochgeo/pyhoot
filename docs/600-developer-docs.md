@@ -18,11 +18,13 @@ source /opt/rh/devtoolset-8/enable
 export HOOT_HOME=/home/vagrant/pyhoot/build/
 export ICU_DATA=/home/vagrant/pyhoot/build/res
 sudo yum install python-sphinx
-pip install wheel patchelf
+pip install numpy wheel patchelf
 cd pyhoot
-make clean && make
+make clean
+python -m pip install .
+mkdir -p $ICU_DATA
 python -m hoot download-data
-make test
+make -j$(nproc) test
 ```
 
 To create an installation package:
