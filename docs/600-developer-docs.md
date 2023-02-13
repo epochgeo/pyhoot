@@ -17,6 +17,7 @@ Then, install pyhoot and run the tests. This will build all the C++ bindings and
 source /opt/rh/devtoolset-8/enable
 export HOOT_HOME=/home/vagrant/pyhoot/build/
 export ICU_DATA=/home/vagrant/pyhoot/build/res
+export PROJ_LIB=$HOOT_HOME
 sudo yum install python-sphinx
 pip install numpy wheel patchelf
 cd pyhoot
