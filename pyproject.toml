@@ -8,7 +8,7 @@ build = "build.sh"
 
 [build-system]
 requires = [
-    "conan>=1.42",
+    "conan==1.59.0",
     "setuptools"
 ]
 build-backend = "setuptools.build_meta"

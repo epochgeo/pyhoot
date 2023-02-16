@@ -89,6 +89,8 @@ removed from this OsmMap entirely.
     .def("visitNodesRo", &OsmMap::visitNodesRo)
     .def("numNodesAppended", &OsmMap::numNodesAppended)
     .def("numNodesSkippedForAppending", &OsmMap::numNodesSkippedForAppending)
+    .def("getWay",
+        static_cast<WayPtr (OsmMap::*)(ElementId)>(&OsmMap::getWay))
     .def("getWays", &OsmMap::getWays)
     .def("getWayIds", &OsmMap::getWayIds)
     .def("getWayCount", &OsmMap::getWayCount)
@@ -102,6 +104,9 @@ removed from this OsmMap entirely.
     .def("getRelations", [](OsmMap& self) {
       return std::map<long, ElementPtr>(self.getRelations().begin(), self.getRelations().end());
     })
+    // not sure why this isn't compiling
+    // .def("getRelation",
+    //     static_cast<ConstRelationPtr (OsmMap::*)(ElementId)>(&OsmMap::getRelation))
     .def("getRelationIds", [](OsmMap& self) {
       return self.getRelationIds().toList().toStdList();
     })

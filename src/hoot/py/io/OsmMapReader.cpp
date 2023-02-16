@@ -112,6 +112,7 @@ getCopyright Copyright statement, if supplied in JSON
     (m, "OsmXmlReader", osmMapReader)
     .def(py::init<>())
     .def("readFromString", &OsmXmlReader::readFromString)
+    .def("setUseDataSourceIds", &OsmXmlReader::setUseDataSourceIds)
   ;
 
   PyBindModule::remapNames(osmXmlReader);

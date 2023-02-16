@@ -241,6 +241,12 @@ types include "building", "multipolygon" and "multilinestring".
     .def("getY", &Node::getY)
     ;
   PyBindModule::remapNames(node);
+
+  auto way = py::class_<hoot::Way, std::shared_ptr<Way> >(m, "Way", element)
+    .def_static("className", &Way::className)
+    .def("getNodeIds", &Way::getNodeIds)
+    ;
+  PyBindModule::remapNames(way);
 }
 
 REGISTER_PYHOOT_SUBMODULE(init_Element)

@@ -20,6 +20,9 @@ clean:
 	rm -f conan.lock
 	#$(MAKE) -C sphinx clean
 
+#clean_wheel:
+#	rm -rf build/temp.linux-x86_64-cpython-37
+
 build_wheel: $(FINAL_WHEEL)
 
 # Run pyhoot unit tests on a local build of pyhoot.
@@ -116,4 +119,4 @@ build/conf/dictionary/words.sqlite: build
 	bunzip2 > $@
 
 build/lib/libpyhoot.so: build/Makefile .force
-	$(MAKE) -C build
+	$(MAKE) -j10 -C build
