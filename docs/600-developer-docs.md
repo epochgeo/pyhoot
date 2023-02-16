@@ -14,17 +14,15 @@ Install Visual Studio Code and set up a terminal pointing to your VM:
 
 Then, install pyhoot and run the tests. This will build all the C++ bindings and create a wheel:
 ```
-source /opt/rh/devtoolset-8/enable
-export HOOT_HOME=/home/vagrant/pyhoot/build/
-export ICU_DATA=/home/vagrant/pyhoot/build/res
-export PROJ_LIB=$HOOT_HOME
+source ~/.bash_profile
 sudo yum install python-sphinx
-pip install numpy wheel patchelf
+pip install numpy wheel patchelf auditwheel twine
 cd pyhoot
 make clean
 python -m pip install .
 mkdir -p $ICU_DATA
 python -m hoot download-data
+# Running test also forces a download of the words dictionary.
 make -j$(nproc) test
 ```
 
@@ -38,7 +36,7 @@ To test deploy the installation package (see further instructions in Makefile ta
 * Update the `setup.py` `setup` method with the new version (TODO: temporary).
 * Upload a test version to https://test.pypi.org/project/hoot/<version>
 ```
-make uploadtest
+make clean && make uploadtest
 ```
 
 To deploy the actual installation package (see further instructions in Makefile target; deploy to 
@@ -46,5 +44,5 @@ test repo first to be safe):
 * Follow the steps above to update the software version.
 * Upload a production version to https://pypi.org/project/hoot/<version>:
 ```
-make uploadfinal
+make clean && make uploadfinal
 ```
