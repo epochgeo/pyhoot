@@ -155,7 +155,7 @@ class CMakeBuild(build_ext):
 
 # TODO: make the version be read from the VERSION file again
 setup(name = 'hoot',
-        version = "0.2.64.11",
+        version = "0.2.64.12",
         description = 'This is an unofficial wrapper of Hootenanny',
         long_description = open("README.md").read(),
         long_description_content_type = "text/markdown",

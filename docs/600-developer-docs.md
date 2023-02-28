@@ -12,11 +12,12 @@ Install Visual Studio Code and set up a terminal pointing to your VM:
 * Rename the entry from `default` to something unique.
 * Create a terminal connection pointing to the config file entry's name within VS Code.
 
-Then, install pyhoot and run the tests. This will build all the C++ bindings and create a wheel:
+Then, install pyhoot and run the tests. This will build all the C++ bindings and create a wheel 
+file:
 ```
 source ~/.bash_profile
 sudo yum install python-sphinx
-pip install numpy wheel patchelf auditwheel twine
+pip install numpy wheel patchelf auditwheel twine build
 cd pyhoot
 make clean
 python -m pip install .
@@ -36,13 +37,12 @@ To test deploy the installation package (see further instructions in Makefile ta
 * Update the `setup.py` `setup` method with the new version (TODO: temporary).
 * Upload a test version to https://test.pypi.org/project/hoot/<version>
 ```
-make clean && make uploadtest
+make -j$(nproc) uploadtest
 ```
 
-To deploy the actual installation package (see further instructions in Makefile target; deploy to 
-test repo first to be safe):
+To deploy the actual installation package (see further instructions in Makefile target:
 * Follow the steps above to update the software version.
 * Upload a production version to https://pypi.org/project/hoot/<version>:
 ```
-make clean && make uploadfinal
+make -j$(nproc) uploadfinal
 ```
