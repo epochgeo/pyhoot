@@ -1,5 +1,5 @@
 
-# pyhot
+# pyhoot
 
 These are the unofficial Python bindings for
 [Hootenanny](https://github.com/ngageoint/hootenanny).
