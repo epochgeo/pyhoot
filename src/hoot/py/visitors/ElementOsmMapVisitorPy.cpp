@@ -56,8 +56,8 @@ public:
   void setFunction(PyElementVisitFunction func) { _func = func; }
 
 private:
-  PyElementVisitFunction _func;
 
+  PyElementVisitFunction _func;
 };
 
 void init_ElementOsmMapVisitorPy(py::module_& m)
