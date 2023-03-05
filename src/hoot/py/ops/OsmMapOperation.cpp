@@ -6,12 +6,11 @@
  */
 
 // hoot
-//#include <hoot/core/elements/OsmMap.h>
 #include <hoot/core/ops/MapCleaner.h>
-//#include <hoot/core/ops/ConstOsmMapOperation.h>
 #include <hoot/core/ops/RecursiveElementRemover.h>
 #include <hoot/core/ops/ReplaceElementOp.h>
 #include <hoot/core/ops/SuperfluousNodeRemover.h>
+#include <hoot/core/ops/RemoveRelationByEid.h>
 
 // pybind11
 #include <pybind11/functional.h>
@@ -31,7 +30,7 @@ using namespace std;
 namespace hoot
 {
 
-using PyMapOpFunction = std::function<void(const std::shared_ptr<OsmMap>& map)>;
+using PyConstMapOpFunction = std::function<void(const std::shared_ptr<OsmMap>& map)>;
 
 class ConstOsmMapOperationPy : public ConstOsmMapOperation
 {
@@ -46,6 +45,38 @@ public:
    * @see ConstOsmMapOperation
    */
   void apply(const std::shared_ptr<OsmMap>& map) override
+  {
+    _func(map);
+  }
+
+  QString getDescription() const override
+  { return "Runs a custom python map operation"; }
+  QString getName() const override { return className(); }
+  QString getClassName() const override { return className(); }
+
+  PyConstMapOpFunction getFunction() { return _func; }
+  void setFunction(PyConstMapOpFunction func) { _func = func; }
+
+private:
+
+  PyConstMapOpFunction _func;
+};
+
+using PyMapOpFunction = std::function<void(std::shared_ptr<OsmMap>& map)>;
+
+class OsmMapOperationPy : public OsmMapOperation
+{
+public:
+
+  static QString className() { return "OsmMapOperationPy"; }
+
+  OsmMapOperationPy() = default;
+  ~OsmMapOperationPy() = default;
+
+  /**
+   * @see OsmMapOperation
+   */
+  void apply(std::shared_ptr<OsmMap>& map) override
   {
     _func(map);
   }
@@ -72,6 +103,13 @@ static void init_ConstOsmMapOperation(py::module_& m)
   ;
   PyBindModule::remapNames(constOsmMapOperation);
 
+  auto osmMapOperation = py::class_<OsmMapOperation>(m, "OsmMapOperation")
+    .def("apply", [](OsmMapOperation& self, OsmMapPtr& map) {
+      self.apply(map);
+    })
+  ;
+  PyBindModule::remapNames(osmMapOperation);
+
   auto wrapme = py::class_<ConstOsmMapOperationPy, shared_ptr<ConstOsmMapOperationPy> >
       (m, "ConstOsmMapOperationPy", constOsmMapOperation)
       .def(py::init<>())
@@ -83,6 +121,18 @@ static void init_ConstOsmMapOperation(py::module_& m)
   )TOK")
     ;
     PyBindModule::remapNames(wrapme);
+
+  auto wrapme2 = py::class_<OsmMapOperationPy, shared_ptr<OsmMapOperationPy> >
+      (m, "OsmMapOperationPy", osmMapOperation)
+      .def(py::init<>())
+      .def_property("function",
+        &OsmMapOperationPy::getFunction,
+        &OsmMapOperationPy::setFunction, R"TOK(
+  function is the user defined function that will be called for all elements. Elements can be
+  modified directly by the user function.
+  )TOK")
+    ;
+    PyBindModule::remapNames(wrapme2);
 
   auto recursiveElementRemover = py::class_<RecursiveElementRemover,
     std::shared_ptr<RecursiveElementRemover> >
@@ -96,6 +146,12 @@ static void init_ConstOsmMapOperation(py::module_& m)
     .def(py::init([](ElementId eid1, ElementId eid2) { return new ReplaceElementOp(eid1, eid2); }))
   ;
   PyBindModule::remapNames(replaceElementOp);
+
+  auto removeRelationByEid = py::class_<RemoveRelationByEid, std::shared_ptr<RemoveRelationByEid> >
+      (m, "RemoveRelationByEid", osmMapOperation)
+    .def(py::init([](long rid) { return new RemoveRelationByEid(rid); }))
+  ;
+  PyBindModule::remapNames(removeRelationByEid);
 
   registerClass<SuperfluousNodeRemover>(m);
   registerClass<MapCleaner>(m);
