@@ -10,6 +10,7 @@
 #include <hoot/core/visitors/ElementOsmMapVisitor.h>
 #include <hoot/core/visitors/RemoveElementsVisitor.h>
 #include <hoot/core/visitors/RemoveMissingElementsVisitor.h>
+#include <hoot/core/visitors/WayGeneralizeVisitor.h>
 
 #include <hoot/py/bindings/HootInterfaces.h>
 #include <hoot/py/bindings/QtBindings.h>
@@ -64,6 +65,8 @@ void init_ElementOsmMapVisitorPy(py::module_& m)
 {
   auto elementVisitor = py::class_<ElementVisitor, shared_ptr<ElementVisitor> >
     (m, "ElementVisitor");
+  auto elementOsmMapVisitor = py::class_<ElementOsmMapVisitor, shared_ptr<ElementOsmMapVisitor> >
+    (m, "ElementOsmMapVisitor");
 
   auto wrapme = py::class_<ElementOsmMapVisitorPy, shared_ptr<ElementOsmMapVisitorPy> >
     (m, "ElementOsmMapVisitorPy", elementVisitor)
@@ -81,6 +84,13 @@ modified directly by the user function.
     .def("setRecursive", &RemoveElementsVisitor::setRecursive)
   ;
   PyBindModule::remapNames(removeElementsVisitor);
+
+  auto wayGeneralizeVisitor = registerSubclass2<WayGeneralizeVisitor>(m, elementOsmMapVisitor)
+    .def("setEpsilon", &WayGeneralizeVisitor::setEpsilon)
+    .def("setRemoveNodesSharedByWays", &WayGeneralizeVisitor::setRemoveNodesSharedByWays)
+    .def("addCriterion", &WayGeneralizeVisitor::addCriterion)
+  ;
+  PyBindModule::remapNames(wayGeneralizeVisitor);
 
   registerSubclass<RemoveMissingElementsVisitor>(m, elementVisitor);
 }

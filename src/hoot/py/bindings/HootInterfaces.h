@@ -7,6 +7,8 @@
 #ifndef HOOTINTERFACES_H
 #define HOOTINTERFACES_H
 
+//#include <typeinfo>
+
 #include <hoot/core/algorithms/extractors/AbstractDistanceExtractor.h>
 #include <hoot/core/algorithms/string/StringDistanceConsumer.h>
 #include <hoot/core/criterion/ElementCriterionConsumer.h>
@@ -14,6 +16,8 @@
 #include <hoot/core/ops/OsmMapOperation.h>
 #include <hoot/core/util/Configurable.h>
 #include <hoot/core/util/Settings.h>
+#include <hoot/core/visitors/ElementOsmMapVisitor.h>
+#include <hoot/core/util/Log.h>
 
 #include <hoot/py/bindings/QtBindings.h>
 #include <hoot/py/bindings/PyBindModule.h>
@@ -22,6 +26,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/embed.h>
 
 namespace py = pybind11;
 
@@ -30,6 +35,7 @@ namespace py = pybind11;
 namespace hoot
 {
 
+using OsmMapPtr = std::shared_ptr<OsmMap>;
 using ConstOsmMapPtr = std::shared_ptr<const OsmMap>;
 using ConstAbstractDistanceExtractorPtr = std::shared_ptr<const AbstractDistanceExtractor>;
 
@@ -126,6 +132,30 @@ void wrapConstOsmMapConsumer(Wrapper& wrapper)
     .def("setOsmMap", &T::setOsmMap)
     // this isn't explicit in the interface but it is the convention.
     .def(py::init([](ConstOsmMapPtr map) {
+      T* result = new T();
+      result->setOsmMap(map.get());
+      return result;
+    }))
+  ;
+}
+
+////
+// Wrap class with OsmMapConsumer, if appropriate
+////
+template<class T, typename Wrapper,
+  typename std::enable_if<!std::is_base_of<OsmMapConsumer, T>::value, T>::type* = nullptr
+>
+void wrapOsmMapConsumer(Wrapper& wrapper) {}
+
+template<class T, typename Wrapper,
+  typename std::enable_if<std::is_base_of<OsmMapConsumer, T>::value, T>::type* = nullptr
+>
+void wrapOsmMapConsumer(Wrapper& wrapper)
+{
+  wrapper
+    .def("setOsmMap", &T::setOsmMap)
+    // this isn't explicit in the interface but it is the convention.
+    .def(py::init([](OsmMapPtr map) {
       T* result = new T();
       result->setOsmMap(map.get());
       return result;
@@ -271,6 +301,19 @@ void registerInterfaces(py::class_<T, std::shared_ptr<T> > wrapme)
   wrapStringDistanceConsumerAndConfigurable<T>(wrapme);
 }
 
+template<class T>
+void registerInterfaces2(py::class_<T, std::shared_ptr<T> > wrapme)
+{
+  wrapAbstractDistanceExtractor<T>(wrapme);
+  wrapConfigurable<T>(wrapme);
+  wrapOsmMapConsumer<T>(wrapme);
+  wrapElementCriterionConsumer<T>(wrapme);
+  wrapOsmMapOperationConsumer<T>(wrapme);
+  wrapStringDistanceConsumer<T>(wrapme);
+  // StringDistanceConsumer and Configurable are implemented, add another constructor
+  wrapStringDistanceConsumerAndConfigurable<T>(wrapme);
+}
+
 /**
  * registerClass registers and wraps the provided class (T) with a default constructor and known
  * interfaces.
@@ -308,6 +351,28 @@ py::class_<T, std::shared_ptr<T> > registerSubclass(py::module_& m, Base& parent
   ;
 
   registerInterfaces(result);
+  PyBindModule::remapNames(result);
+
+  return result;
+}
+
+/**
+ Same as registerSubclass but wraps with OsmMapConsumer instead of ConstOsmMapConsumer
+
+ kludgy but the only thing I've been able to figure out so far - BDW
+*/
+template<class T, typename Base>
+py::class_<T, std::shared_ptr<T> > registerSubclass2(py::module_& m, Base& parent)
+{
+  QString className = T::className().replace("hoot::", "");
+  auto result = py::class_<T, std::shared_ptr<T> >
+    (m, className.toUtf8().constData(), parent)
+    .def(py::init([]() {
+      return new T();
+    }))
+  ;
+
+  registerInterfaces2(result);
   PyBindModule::remapNames(result);
 
   return result;

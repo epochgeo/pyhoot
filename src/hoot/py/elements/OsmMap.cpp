@@ -16,6 +16,7 @@
 #include <hoot/core/index/OsmMapIndex.h>
 #include <hoot/core/visitors/ElementVisitor.h>
 #include <hoot/core/visitors/ConstElementVisitor.h>
+#include <hoot/core/visitors/ElementOsmMapVisitor.h>
 
 #include <hoot/py/bindings/QtBindings.h>
 #include <hoot/py/bindings/PyBindModule.h>
@@ -65,6 +66,7 @@ If the visitor implements OsmMapConsumer then setOsmMap will be called before
 visiting any elements.
 )TOK")
     .def("visitRw", [](OsmMap& self, ConstElementVisitor& v) { self.visitRw(v); })
+    .def("visitRw", [](OsmMap& self, ElementOsmMapVisitor& v) { self.visitRw(v); })
     .def("getNode",
         static_cast<NodePtr (OsmMap::*)(const ElementId&)>(&OsmMap::getNode))
     .def("getNodes", [](OsmMap& self) {
