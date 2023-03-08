@@ -11,6 +11,7 @@
 #include <hoot/core/ops/ReplaceElementOp.h>
 #include <hoot/core/ops/SuperfluousNodeRemover.h>
 #include <hoot/core/ops/RemoveRelationByEid.h>
+#include <hoot/core/util/Factory.h>
 
 // pybind11
 #include <pybind11/functional.h>
