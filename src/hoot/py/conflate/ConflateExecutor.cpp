@@ -7,6 +7,7 @@
 
 // hoot
 #include <hoot/core/conflate/ConflateExecutor.h>
+#include <hoot/core/elements/OsmMap.h>
 
 // pybind11
 #include <pybind11/functional.h>
@@ -16,7 +17,6 @@
 // pyhoot
 #include <hoot/py/bindings/QtBindings.h>
 #include <hoot/py/bindings/PyBindModule.h>
-#include <hoot/py/conflate/PythonConflateExecutor.h>
 
 // qt
 #include <QSet>
@@ -24,9 +24,69 @@
 namespace py = pybind11;
 
 using namespace hoot;
+using namespace std;
 
 namespace hoot
 {
+
+using PyMapOpFunction = std::function<void(std::shared_ptr<OsmMap>& map)>;
+
+class PythonConflateExecutor : public ConflateExecutor
+{
+public:
+
+  static QString className() { return "PythonConflateExecutor"; }
+
+  PythonConflateExecutor() = default;
+  ~PythonConflateExecutor() = default;
+
+  std::vector<PyMapOpFunction> getPreOps() { return _preOps; }
+  void setPreOps(std::vector<PyMapOpFunction> preOps) { _preOps = preOps; }
+
+  std::vector<string> getPreOpNames() { return _preOpNames; }
+  void setPreOpNames(std::vector<std::string> preOpNames) { _preOpNames = preOpNames; }
+
+  std::vector<PyMapOpFunction> getPostOps() { return _postOps; }
+  void setPostOps(std::vector<PyMapOpFunction> postOps) { _postOps = postOps; }
+
+  std::vector<string> getPostOpNames() { return _postOpNames; }
+  void setPostOpNames(std::vector<std::string> postOpNames) { _postOpNames = postOpNames; }
+
+protected:
+
+  void _runConflatePreOps(OsmMapPtr map) override
+  {
+    ConflateExecutor::_runConflatePreOps(map);
+
+    for (int i = 0; i < _preOps.size(); i++)
+    {
+      PyMapOpFunction function = _preOps.at(i);
+      std::string op_name = _preOpNames.at(i);
+      LOG_STATUS("Executing " + op_name + "...");
+      function(map);
+    }
+  }
+
+  void _runConflatePostOps(OsmMapPtr map) override
+  {
+    ConflateExecutor::_runConflatePostOps(map);
+
+    for (int i = 0; i < _preOps.size(); i++)
+    {
+      PyMapOpFunction function = _postOps.at(i);
+      std::string op_name = _postOpNames.at(i);
+      LOG_STATUS("Executing " + op_name + "...");
+      function(map);
+    }
+  }
+
+private:
+
+  std::vector<PyMapOpFunction> _preOps;
+  std::vector<std::string> _preOpNames;
+  std::vector<PyMapOpFunction> _postOps;
+  std::vector<std::string> _postOpNames;
+};
 
 void init_ConflateExecutor(py::module_& m)
 {
@@ -63,12 +123,18 @@ conflate two inputs and write the conflated data to an output.
   function is the user defined function that will be called for all elements. Elements can be
   modified directly by the user function.
   )TOK")
-   .def_property("postOps",
+      .def_property("preOpNames",
+        &PythonConflateExecutor::getPreOpNames,
+        &PythonConflateExecutor::setPreOpNames)
+      .def_property("postOps",
         &PythonConflateExecutor::getPostOps,
         &PythonConflateExecutor::setPostOps, R"TOK(
   function is the user defined function that will be called for all elements. Elements can be
   modified directly by the user function.
   )TOK")
+      .def_property("postOpNames",
+        &PythonConflateExecutor::getPostOpNames,
+        &PythonConflateExecutor::setPostOpNames)
     ;
   PyBindModule::remapNames(pythonConflateExecutor);
 }
