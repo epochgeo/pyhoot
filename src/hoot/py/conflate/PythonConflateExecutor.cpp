@@ -27,9 +27,11 @@ void PythonConflateExecutor::_runConflatePreOps(OsmMapPtr map)
 {
   ConflateExecutor::_runConflatePreOps(map);
 
-  for (auto iterator = _preOps.begin(); iterator != _preOps.end(); ++iterator)
+  for (int i = 0; i < _preOps.size(); i++)
   {
-    PyMapOpFunction function = *iterator;
+    PyMapOpFunction function = _preOps.at(i);
+    std::string op_name = _preOpNames.at(i);
+    LOG_STATUS("Executing " + op_name + "...");
     function(map);
   }
 }
@@ -38,9 +40,11 @@ void PythonConflateExecutor::_runConflatePostOps(OsmMapPtr map)
 {
   ConflateExecutor::_runConflatePostOps(map);
 
-  for (auto iterator = _postOps.begin(); iterator != _postOps.end(); ++iterator)
+  for (int i = 0; i < _preOps.size(); i++)
   {
-    PyMapOpFunction function = *iterator;
+    PyMapOpFunction function = _postOps.at(i);
+    std::string op_name = _postOpNames.at(i);
+    LOG_STATUS("Executing " + op_name + "...");
     function(map);
   }
 }

@@ -35,8 +35,14 @@ public:
   std::vector<PyMapOpFunction> getPreOps() { return _preOps; }
   void setPreOps(std::vector<PyMapOpFunction> preOps) { _preOps = preOps; }
 
+  std::vector<string> getPreOpNames() { return _preOpNames; }
+  void setPreOpNames(std::vector<std::string> preOpNames) { _preOpNames = preOpNames; }
+
   std::vector<PyMapOpFunction> getPostOps() { return _postOps; }
   void setPostOps(std::vector<PyMapOpFunction> postOps) { _postOps = postOps; }
+
+  std::vector<string> getPostOpNames() { return _postOpNames; }
+  void setPostOpNames(std::vector<std::string> postOpNames) { _postOpNames = postOpNames; }
 
 protected:
 
@@ -46,7 +52,9 @@ protected:
 private:
 
   std::vector<PyMapOpFunction> _preOps;
+  std::vector<std::string> _preOpNames;
   std::vector<PyMapOpFunction> _postOps;
+  std::vector<std::string> _postOpNames;
 };
 
 }
