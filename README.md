@@ -55,15 +55,32 @@ sudo yum install libSM libX11 libXext libXrender
 python3 -m pip install hoot
 ```
 
-## Example
+## Examples
 
 The following python example conflates two sample files that come with pyhoot and writes the result
-to `out.osm`.
+to `out.osm`:
 
 ```
 import hoot
 
-hoot.ConflateExecutor().conflate(hoot.TOY_TEST_A_PATH, hoot.TOY_TEST_B_PATH, "out.osm")
+hoot.PythonConflateExecutor().conflate(hoot.TOY_TEST_A_PATH, hoot.TOY_TEST_B_PATH, "out.osm")
+```
+
+The next python example conflates the same two sample files and defines a schema translation for the
+data and custom map operations to run before and after conflation:
+```
+import hoot
+
+custom_op_1 = CustomOp()
+custom_op_2 = CustomOp()
+
+conflator = hoot.PythonConflateExecutor()
+conflator.pre_ops = [custom_op_1.op_func]
+conflator.pre_op_names = ["CustomOp1"]
+conflator.pre_ops = [custom_op_2.op_func]
+conflator.pre_op_names = ["CustomOp2"]
+
+conflator.conflate(hoot.TOY_TEST_A_PATH, hoot.TOY_TEST_B_PATH, "out.osm")
 ```
 
 ## Documentation
