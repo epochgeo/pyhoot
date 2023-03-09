@@ -7,6 +7,7 @@
 
 #include <pybind11/pybind11.h>
 
+#include <hoot/core/util/Log.h>
 #include <hoot/core/elements/Element.h>
 
 #include <hoot/py/bindings/QtBindings.h>
