@@ -20,11 +20,11 @@ sudo yum install python-sphinx
 pip install numpy wheel patchelf auditwheel twine build
 cd pyhoot
 make clean
-python -m pip install .
 mkdir -p $ICU_DATA
 python -m hoot download-data
 # Running test also forces a download of the words dictionary.
 make -j$(nproc) test
+ython -m pip install .
 ```
 
 To create an installation package:
