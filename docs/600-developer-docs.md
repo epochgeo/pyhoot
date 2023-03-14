@@ -32,10 +32,11 @@ To create an installation package:
 make -j$(nproc) install
 ```
 
-To test deploy the installation package (see further instructions in Makefile target):
+To test deploy the installation package:
 * Update `VERSION` with the new version.
 * Update the `setup.py` `setup` method with the new version (TODO: temporary).
-* Upload a test version to https://test.pypi.org/project/hoot/<version>
+* Update `TWINE_TOKEN` in the Makefile
+* Upload a test version to https://test.pypi.org/project/hoot/<version>:
 ```
 make -j$(nproc) uploadtest
 ```
