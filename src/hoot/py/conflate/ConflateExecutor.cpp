@@ -71,7 +71,7 @@ protected:
   {
     ConflateExecutor::_runConflatePostOps(map);
 
-    for (int i = 0; i < _preOps.size(); i++)
+    for (int i = 0; i < _postOps.size(); i++)
     {
       PyMapOpFunction function = _postOps.at(i);
       std::string op_name = _postOpNames.at(i);
