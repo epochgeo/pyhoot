@@ -77,8 +77,8 @@ custom_op_2 = CustomOp()
 conflator = hoot.PythonConflateExecutor()
 conflator.pre_ops = [custom_op_1.op_func]
 conflator.pre_op_names = ["CustomOp1"]
-conflator.pre_ops = [custom_op_2.op_func]
-conflator.pre_op_names = ["CustomOp2"]
+conflator.post_ops = [custom_op_2.op_func]
+conflator.post_op_names = ["CustomOp2"]
 
 conflator.conflate(hoot.TOY_TEST_A_PATH, hoot.TOY_TEST_B_PATH, "out.osm")
 ```
