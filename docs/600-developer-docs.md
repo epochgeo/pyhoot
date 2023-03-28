@@ -19,8 +19,9 @@ source ~/.bash_profile
 sudo yum install python-sphinx
 pip install numpy wheel patchelf auditwheel twine build
 cd pyhoot
-make clean
+make clean && make
 mkdir -p $ICU_DATA
+pip install -e .
 python -m hoot download-data
 # Running test also forces a download of the words dictionary.
 make -j$(nproc) test
